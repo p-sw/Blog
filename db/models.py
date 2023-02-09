@@ -6,6 +6,7 @@ class Series(Model):
     id = fields.IntField(pk=True)
 
     posts: fields.ReverseRelation["Post"]
+    tags: fields.ManyToManyRelation["Tag"] = fields.ManyToManyField("models.Tag", related_name="series", through="series_tags", null=True, on_delete=fields.SET_NULL)
 
     name = fields.CharField(max_length=255, unique=True, index=True)
     description = fields.TextField()
@@ -26,6 +27,7 @@ class Tag(Model):
     name = fields.CharField(max_length=15)
 
     posts: fields.ReverseRelation["Post"]
+    series: fields.ReverseRelation["Series"]
 
     class Meta:
         table="tags"
