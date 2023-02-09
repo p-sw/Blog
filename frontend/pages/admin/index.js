@@ -2,11 +2,9 @@ import {tokenValidate, hasToken, ServerSideRedirection} from "@/components/api"
 import {useEffect, useState} from "react";
 import DefaultLayout from "@/layouts/default";
 import {Button, Flex, Menu, MenuButton, MenuItem, MenuList, Text} from "@chakra-ui/react";
-import {AdminPostItem} from "@/components/postitem";
+import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
 import {ChevronDownIcon} from "@chakra-ui/icons";
-import {AdminSeriesItem} from "@/components/seriesitem";
-import {AdminTagItem} from "@/components/tagitem";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
