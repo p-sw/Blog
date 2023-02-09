@@ -164,8 +164,8 @@ async def create_post(body: PostCreateRequest):
         thumbnail=body.thumbnail,
         hidden=body.hidden,
     )
-    if body.tag_ids:
-        for tag in body.tag_ids:
+    if body.tags:
+        for tag in body.tags:
             await post.tags.add((await Tag.get_or_create(name=tag))[0])
     return await Light_Post_Frontmatter.from_tortoise_orm(post)
 
@@ -216,6 +216,9 @@ async def create_series(body: SeriesCreateRequest):
     if body.posts:
         for post in body.posts:
             await Post.filter(id=post).update(series=series)
+    if body.tags:
+        for tag in body.tags:
+            await series.tags.add((await Tag.get_or_create(name=tag))[0])
     return series
 
 @admin.get("/series/unique-name", response_model=ResultBoolResponse)
