@@ -29,7 +29,7 @@ async function getSeries(token="") {
   });
 }
 
-async function createSeries({name, description, thumbnail=null, hidden=false, posts=[]}, token) {
+async function createSeries({name, description, thumbnail=null, hidden=false, posts=[], tags=[]}, token) {
   return await fetch("http://127.0.0.1:8000/admin/series", {
     method: "POST",
     headers: {
@@ -41,7 +41,8 @@ async function createSeries({name, description, thumbnail=null, hidden=false, po
       description: description,
       thumbnail: thumbnail,
       hidden: hidden,
-      posts: posts
+      posts: posts,
+      tags: tags
     })
   });
 }

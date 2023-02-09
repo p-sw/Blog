@@ -66,7 +66,7 @@ export function AdminTagItem({tag}) {
   let router = useRouter();
 
   return <Card direction={"row"} boxSizing={"border-box"} p={"20px"}>
-    <Flex direction={"column"} w={"100%"}>
+    <Flex direction={"column"} w={"100%"} alignItems={"center"} justifyContent={"center"}>
       <CardBody textAlign={"center"}>
         <Heading fontSize={"3xl"} fontWeight={"bold"}>{tag.name}</Heading>
       </CardBody>

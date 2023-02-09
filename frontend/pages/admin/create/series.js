@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import Form from "@/components/form";
 import {Search2Icon} from "@chakra-ui/icons";
+import {AdminPostItem, AdminTagItem} from "@/components/items";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
@@ -38,18 +39,24 @@ export async function getServerSideProps(context) {
 }
 
 export default function SeriesCreateForm({token}) {
-  let [body, setBody] = useState({name: "", description: "", thumbnail: null, posts: [], hidden: false});
-  let [prevBody, setPrevBody] = useState({name: "", description: "", thumbnail: null, posts: [], hidden: false});
+  let [body, setBody] = useState({name: "", description: "", thumbnail: null, posts: [], tags: [], hidden: false});
+  let [prevBody, setPrevBody] = useState({name: "", description: "", thumbnail: null, posts: [], tags: [], hidden: false});
   let [uniqueTitle, setUniqueT] = useState(true);
 
-  let [postIdTitleDict, setPostIdTitleDict] = useState({});
+  let [postIdDict, setPostIdDict] = useState({});
+  let [tagIdDict, setTagIdDict] = useState({});
 
   let [postSelectorText, setPostSelectorText] = useState("");
+  let [tagSelectorText, setTagSelectorText] = useState("");
   let [postSearchResult, setPostSearchResult] = useState([]);
+  let [tagSearchResult, setTagSearchResult] = useState([]);
 
   let {isOpen: postSelectorOpened, onOpen: openPostSelector, onClose: closePostSelector} = useDisclosure();
+  let {isOpen: tagSelectorOpened, onOpen: openTagSelector, onClose: closeTagSelector} = useDisclosure();
   let postSelectorOpenerRef = useRef();
+  let tagSelectorOpenerRef = useRef();
   let [selectedPost, setSelectedPost] = useState("");
+  let [selectedTag, setSelectedTag] = useState("");
 
   let router = useRouter();
   let {pid} = router.query;
@@ -84,7 +91,7 @@ export default function SeriesCreateForm({token}) {
         return {...prev, posts: data}
       });
 
-      let idTitleDict = {};
+      let idDict = {};
 
       for (let post of data) {
         fetch(`/api/post/${post}/light`, {
@@ -93,11 +100,42 @@ export default function SeriesCreateForm({token}) {
             "Content-Type": "application/json",
           }
         }).then(res => res.json()).then(data => {
-          idTitleDict[post] = data.title;
+          idDict[post] = data;
         })
       }
 
-      setPostIdTitleDict(idTitleDict);
+      setPostIdDict(idDict);
+    })
+
+    fetch(`/api/series/${pid}/get-tags`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(data => {
+      setPrevBody(prev => {
+        return {...prev, tags: data}
+      });
+      setBody(prev => {
+        return {...prev, tags: data}
+      });
+
+      console.log(data);
+
+      let idDict = {};
+
+      for (let tag in data) {
+        fetch(`/api/tag/${tag}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }).then(res => res.json()).then(data => {
+          idDict[tag] = data;
+        })
+      }
+
+      setTagIdDict(idDict);
     })
   }, [pid]);
 
@@ -117,6 +155,10 @@ export default function SeriesCreateForm({token}) {
     setPostSelectorText("");
   }, [postSelectorOpened]);
 
+  useEffect(function initTagSelector() {
+    setTagSelectorText("");
+  }, [tagSelectorOpened]);
+
   function searchPost() {
     fetch(`/api/post/search-by-title?query=${postSelectorText}`, {
       method: "GET",
@@ -126,15 +168,37 @@ export default function SeriesCreateForm({token}) {
       }
     }).then(res => res.json()).then(data => {
       setPostSearchResult(data);
-      let data_id_title = {}
+      let data_id = {}
       for (let i = 0; i < data.length; i++) {
-        data_id_title[data[i].id] = data[i].title;
+        data_id[data[i].id] = data[i];
       }
-      setPostIdTitleDict({...postIdTitleDict, ...data_id_title})
+      setPostIdDict({...postIdDict, ...data_id})
+    })
+  }
+
+  function searchTag() {
+    fetch(`/api/tag/search-by-name?query=${tagSelectorText}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token
+      }
+    }).then(res => res.json()).then(data => {
+      setTagSearchResult(data);
+      let data_id = {}
+      for (let i = 0; i < data.length; i++) {
+        data_id[data[i].id] = data[i];
+      }
+      setTagIdDict({...tagIdDict, ...data_id})
     })
   }
 
   return <DefaultLayout>
+    <style jsx global>{`
+      body {
+        overflow-x: hidden;
+      }
+    `}</style>
     <Flex
       flexDirection={"column"}
       justifyContent={"center"}
@@ -197,18 +261,19 @@ export default function SeriesCreateForm({token}) {
             <FormControl id={"posts"} mb={"20px"}>
               <FormLabel>Posts</FormLabel>
               <Button ref={postSelectorOpenerRef} onClick={openPostSelector}>Select Posts</Button>
-              <FormHelperText>Current Posts
-                <Stack direction={"row"} spacing={"5px"} display={"inline"} ml={"10px"}>
-                {
-                body.posts
-                  ? body.posts.map((post_id) => {
-                      return <Button key={post_id} display={"inline"} p={"7px"} h={"fit-content"}
-                      _hover={{bgColor: "red.900"}}>{postIdTitleDict[post_id]}</Button>
-                    })
-                  : ""
-                }
-                </Stack>
-              </FormHelperText>
+              <FormHelperText>Current Posts</FormHelperText>
+              <Stack direction={"column"} spacing={"5px"} display={"inline"} ml={"10px"}>
+              {
+              body.posts
+                ? body.posts.map((post_id) => {
+                    if (postIdDict[post_id]) {
+                      return <AdminPostItem key={post_id} post={postIdDict[post_id]} />
+                    }
+                    return <></>
+                  })
+                : ""
+              }
+              </Stack>
               <Drawer
                 isOpen={postSelectorOpened}
                 onClose={closePostSelector}
@@ -243,6 +308,58 @@ export default function SeriesCreateForm({token}) {
                     <Button colorScheme={"blue"} onClick={() => {
                       setBody({...body, posts: [...body.posts, parseInt(selectedPost, 10)]});
                       closePostSelector();
+                    }}>Add</Button>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
+            </FormControl>
+            <FormControl id={"tags"} mb={"20px"}>
+              <FormLabel>Tags</FormLabel>
+              <Button ref={tagSelectorOpenerRef} onClick={openTagSelector}>Select Tags</Button>
+              <FormHelperText>Current Tags</FormHelperText>
+              <Stack direction={"column"} spacing={"5px"} display={"inline"} ml={"10px"}>
+              {
+                body.tags
+                  ? body.tags.map((tag_id) => {
+                      return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} />
+                    })
+                  : ""
+              }
+              </Stack>
+              <Drawer
+                isOpen={tagSelectorOpened}
+                onClose={closeTagSelector}
+                placement={"left"}
+                finalFocusRef={tagSelectorOpenerRef}
+              >
+                <DrawerOverlay />
+                <DrawerContent>
+                  <DrawerCloseButton />
+                  <DrawerHeader>Select Tags</DrawerHeader>
+                  <DrawerBody>
+                    <Text fontSize={"sm"} mb={"8px"}>Search for tag</Text>
+                    <InputGroup>
+                      <Input type={"Text"} value={tagSelectorText} onChange={(e) => {setTagSelectorText(e.target.value)}} />
+                      <InputRightElement>
+                        <IconButton onClick={() => {searchTag()}} icon={<Search2Icon />} aria-label={"Search"} />
+                      </InputRightElement>
+                    </InputGroup>
+                    <Divider mb={"20px"} mt={"20px"} />
+                    <RadioGroup onChange={setSelectedTag} value={selectedTag}>
+                      <Stack spacing={5} direction={"column"}>
+                      {
+                        tagSearchResult
+                          ? tagSearchResult.map((tag, index) => <Radio key={index} value={tag.id.toString()} colorScheme={"blue"}>{tag.name}</Radio>)
+                          : ""
+                      }
+                      </Stack>
+                    </RadioGroup>
+                  </DrawerBody>
+                  <DrawerFooter>
+                    <Button variant={"outline"} mr={3} onClick={closeTagSelector}>Cancel</Button>
+                    <Button colorScheme={"blue"} onClick={() => {
+                      setBody({...body, tags: [...body.tags, parseInt(selectedTag, 10)]});
+                      closeTagSelector();
                     }}>Add</Button>
                   </DrawerFooter>
                 </DrawerContent>

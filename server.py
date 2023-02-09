@@ -178,7 +178,7 @@ async def post_unique_title(query: str):
 @admin.get("/post/search-by-title", response_model=List[Light_Post_Frontmatter])
 async def post_search_by_title(query: str):
     response = await \
-        Light_Post_Frontmatter.from_queryset(Post.filter(title__icontains=query).order_by("-id"))
+        Light_Post_Frontmatter.from_queryset(Post.filter(title__icontains=query, series=None).order_by("-id"))
     return response
 
 @admin.get("/tag", response_model=List[SingleTagResponse])
@@ -199,6 +199,12 @@ async def tag_unique_name(query: str):
     if await Tag.filter(name=query).exists():
         return ResultBoolResponse(result=False)
     return ResultBoolResponse(result=True)
+
+@admin.get("/tag/search-by-name", response_model=List[SingleTagResponse])
+async def tag_search_by_name(query: str):
+    response = await \
+        SingleTagResponse.from_queryset(Tag.filter(name__icontains=query).order_by("-id"))
+    return response
 
 @admin.get("/series", response_model=List[SingleSeriesResponse])
 async def get_series(page: int = Query(1)):
@@ -259,6 +265,12 @@ async def get_series_posts(series_id: int):
     series = await Series.get_or_none(id=series_id)
     await series.fetch_related("posts")
     return [post.id for post in series.posts]
+
+@general.get("/series/{series_id}/get-tags", response_model=List[int])
+async def get_series_tags(series_id: int):
+    series = await Series.get_or_none(id=series_id)
+    await series.fetch_related("tags")
+    return [tag.id for tag in series.tags]
 
 @general.get("/tag/{tag_id}", response_model=SingleTagResponse)
 async def get_single_tag(tag_id: int):
