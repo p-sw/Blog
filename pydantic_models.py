@@ -48,7 +48,7 @@ class PostCreateRequest(Request):
     hidden: bool
     thumbnail: str | None
     series_id: int | None
-    tag_ids: list[int] | None
+    tags: list[int] | None
 
 class TagCreateRequest(Request):
     name: str
@@ -58,6 +58,7 @@ class SeriesCreateRequest(Request):
     description: str
     thumbnail: str | None
     posts: list[int] | None
+    tags: list[int] | None
     hidden: bool
 
 class ResultBoolResponse(Response):
