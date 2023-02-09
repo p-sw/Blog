@@ -30,7 +30,7 @@ Request & Response Model Section
 from pydantic_models import (
     UserLoginRequest,
     TokenRequest,
-    TokenResponse, ResultBoolResponse, SeriesCreateRequest, SingleSeriesResponse
+    TokenResponse, ResultBoolResponse, SeriesCreateRequest, SingleSeriesResponse, SeriesUpdateRequest
 )
 from pydantic_models import (
     Light_Post_Frontmatter,
@@ -225,6 +225,28 @@ async def create_series(body: SeriesCreateRequest):
     if body.tags:
         for tag in body.tags:
             await series.tags.add((await Tag.get_or_create(name=tag))[0])
+    return series
+
+@admin.patch("/series", response_model=SingleSeriesResponse)
+async def update_series(body: SeriesUpdateRequest):
+    series = await Series.get_or_none(id=body.id)
+    if series is None:
+        raise HTTPException(status_code=404, detail={"error": "Series not found."})
+    if body.name is not None:
+        series.name = body.name
+    if body.description is not None:
+        series.description = body.description
+    if body.thumbnail is not None:
+        series.thumbnail = body.thumbnail
+    if body.posts is not None:
+        await Post.filter(series_id=series.id).update(series_id=None)
+        for post in body.posts:
+            await Post.filter(id=post).update(series=series)
+    if body.tags is not None:
+        await series.tags.clear()
+        for tag in body.tags:
+            await series.tags.add(await Tag.get(id=tag))
+    await series.save()
     return series
 
 @admin.get("/series/unique-name", response_model=ResultBoolResponse)

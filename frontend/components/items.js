@@ -10,11 +10,14 @@ import {
   MenuButton, MenuItem,
   MenuList,
   Skeleton,
-  Text
+  Text,
+  IconButton
 } from "@chakra-ui/react";
-import {ChevronDownIcon} from "@chakra-ui/icons";
+import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
+import {AiFillDelete} from "react-icons/ai";
+import {FaExternalLinkAlt} from "react-icons/fa";
 
-export function AdminPostItem({post}) {
+export function AdminPostItem({post, inseries=false}) {
   let router = useRouter();
 
   return <Card direction={"row"} w={"100%"} h={"250px"} boxSizing={"border-box"}>
@@ -25,14 +28,19 @@ export function AdminPostItem({post}) {
         <Text>{post.description}</Text>
       </CardBody>
       <CardFooter gap={"10px"}>
-        <Button onClick={async () => await router.push(`/post/${post.id}`)}>View</Button>
+        <IconButton icon={<Icon as={FaExternalLinkAlt} />} onClick={async () => await router.push(`/post/${post.id}`)} aria-label={"view"} />
         <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Action</MenuButton>
+          <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
           <MenuList>
             <MenuItem onClick={async () => {await router.push(`/admin/create/post?pid=${post.id}`)}}>Edit</MenuItem>
             <MenuItem onClick={async () => {}}>Delete</MenuItem>
           </MenuList>
         </Menu>
+        {
+          inseries
+            ? <IconButton onClick={async () => {}} icon={<Icon as={AiFillDelete} />} aria-label={"delete"} />
+            : null
+        }
       </CardFooter>
     </Flex>
   </Card>
@@ -62,7 +70,7 @@ export function AdminSeriesItem({series}) {
   </Card>
 }
 
-export function AdminTagItem({tag}) {
+export function AdminTagItem({tag, inseries=false}) {
   let router = useRouter();
 
   return <Card direction={"row"} boxSizing={"border-box"} p={"20px"}>
@@ -71,8 +79,18 @@ export function AdminTagItem({tag}) {
         <Heading fontSize={"3xl"} fontWeight={"bold"}>{tag.name}</Heading>
       </CardBody>
       <CardFooter gap={"10px"}>
-        <Button onClick={async () => {await router.push(`/admin/create/tag?pid=${tag.id}`)}}>Edit</Button>
-        <Button onClick={async () => {}}>Delete</Button>
+        <Menu>
+          <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
+          <MenuList>
+            <MenuItem onClick={async () => {await router.push(`/admin/create/tag?pid=${tag.id}`)}}>Edit</MenuItem>
+            <MenuItem onClick={async () => {}}>Delete</MenuItem>
+          </MenuList>
+        </Menu>
+        {
+          inseries
+            ? <IconButton onClick={async () => {}} icon={<Icon as={AiFillDelete} />} aria-label={"delete"} />
+            : null
+        }
       </CardFooter>
     </Flex>
   </Card>

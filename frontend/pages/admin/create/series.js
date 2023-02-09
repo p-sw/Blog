@@ -64,7 +64,13 @@ export default function SeriesCreateForm({token}) {
   let toast = useToast();
 
   useEffect(function getPrevBody() {
-    if (pid === undefined) return;
+    if (!pid) return;
+    setPrevBody(prev => {
+      return {...prev, id: pid}
+    });
+    setBody(prev => {
+      return {...prev, id: pid}
+    });
     fetch(`/api/series/${pid}`, {
       method: "GET",
       headers: {
@@ -91,8 +97,7 @@ export default function SeriesCreateForm({token}) {
         return {...prev, posts: data}
       });
 
-      let idDict = {};
-
+      let postDict = {};
       for (let post of data) {
         fetch(`/api/post/${post}/light`, {
           method: "GET",
@@ -100,11 +105,11 @@ export default function SeriesCreateForm({token}) {
             "Content-Type": "application/json",
           }
         }).then(res => res.json()).then(data => {
-          idDict[post] = data;
+          postDict[post] = data;
         })
       }
 
-      setPostIdDict(idDict);
+      setPostIdDict(postDict);
     })
 
     fetch(`/api/series/${pid}/get-tags`, {
@@ -120,22 +125,20 @@ export default function SeriesCreateForm({token}) {
         return {...prev, tags: data}
       });
 
-      console.log(data);
+      let tagDict = {};
 
-      let idDict = {};
-
-      for (let tag in data) {
+      for (let tag of data) {
         fetch(`/api/tag/${tag}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           }
         }).then(res => res.json()).then(data => {
-          idDict[tag] = data;
+          tagDict[tag] = data;
         })
       }
 
-      setTagIdDict(idDict);
+      setTagIdDict(tagDict);
     })
   }, [pid]);
 
@@ -150,14 +153,6 @@ export default function SeriesCreateForm({token}) {
       setUniqueT(data.result);
     })
   }, [body.name, token]);
-
-  useEffect(function initPostSelector() {
-    setPostSelectorText("");
-  }, [postSelectorOpened]);
-
-  useEffect(function initTagSelector() {
-    setTagSelectorText("");
-  }, [tagSelectorOpened]);
 
   function searchPost() {
     fetch(`/api/post/search-by-title?query=${postSelectorText}`, {
@@ -216,9 +211,18 @@ export default function SeriesCreateForm({token}) {
         <Box>
           <Form action={"/api/series"} method={"POST"} submitHandler={(e) => {
             e.preventDefault();
-            console.log(body);
+            let method = "POST";
+            let toastTitle = "Added";
+            let toastDescription = "Successfully added a series.";
+            let failedToastDescription = "Failed to add a series due to unexpected error.";
+            if (pid !== undefined) {
+              method = "PATCH";
+              toastTitle = "Updated";
+              toastDescription = "Successfully updated a series.";
+              failedToastDescription = "Failed to update a series due to unexpected error.";
+            }
             fetch("/api/series", {
-              method: "POST",
+              method: method,
               headers: {
                 "Content-Type": "application/json",
                 "token": token
@@ -227,8 +231,8 @@ export default function SeriesCreateForm({token}) {
             }).then(async res => {
               if (res.status === 200) {
                 toast({
-                  title: "Added",
-                  description: "Successfully added a series.",
+                  title: toastTitle,
+                  description: toastDescription,
                   status: "success",
                   isClosable: true,
                   duration: 3000
@@ -237,7 +241,7 @@ export default function SeriesCreateForm({token}) {
               } else {
                 toast({
                   title: "Failed",
-                  description: "Failed to add a series due to unexpected error.",
+                  description: failedToastDescription,
                   status: "error",
                   isClosable: true,
                   duration: 3000
@@ -264,14 +268,14 @@ export default function SeriesCreateForm({token}) {
               <FormHelperText>Current Posts</FormHelperText>
               <Stack direction={"column"} spacing={"5px"} display={"inline"} ml={"10px"}>
               {
-              body.posts
+              body.posts.length !== 0
                 ? body.posts.map((post_id) => {
                     if (postIdDict[post_id]) {
-                      return <AdminPostItem key={post_id} post={postIdDict[post_id]} />
+                      return <AdminPostItem key={post_id} post={postIdDict[post_id]} inseries={true} />
                     }
-                    return <></>
+                    return <Text key={post_id}></Text>;
                   })
-                : ""
+                : <Text>BodyEmpty</Text>
               }
               </Stack>
               <Drawer
@@ -298,7 +302,7 @@ export default function SeriesCreateForm({token}) {
                       {
                         postSearchResult
                           ? postSearchResult.map((post, index) => <Radio key={index} value={post.id.toString()} colorScheme={"blue"}>{post.title}</Radio>)
-                          : ""
+                          : null
                       }
                       </Stack>
                     </RadioGroup>
@@ -319,11 +323,14 @@ export default function SeriesCreateForm({token}) {
               <FormHelperText>Current Tags</FormHelperText>
               <Stack direction={"column"} spacing={"5px"} display={"inline"} ml={"10px"}>
               {
-                body.tags
+                body.tags.length !== 0
                   ? body.tags.map((tag_id) => {
-                      return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} />
+                      if (tagIdDict[tag_id]) {
+                        return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} inseries={true} />
+                      }
+                      return <Text key={tag_id}></Text>;
                     })
-                  : ""
+                  : <Text>BodyEmpty</Text>
               }
               </Stack>
               <Drawer
@@ -350,7 +357,7 @@ export default function SeriesCreateForm({token}) {
                       {
                         tagSearchResult
                           ? tagSearchResult.map((tag, index) => <Radio key={index} value={tag.id.toString()} colorScheme={"blue"}>{tag.name}</Radio>)
-                          : ""
+                          : null
                       }
                       </Stack>
                     </RadioGroup>

@@ -61,5 +61,14 @@ class SeriesCreateRequest(Request):
     tags: list[int] | None
     hidden: bool
 
+class SeriesUpdateRequest(Request):
+    id: int
+    name: str | None
+    description: str | None
+    thumbnail: str | None
+    posts: list[int] | None
+    tags: list[int] | None
+    hidden: bool | None
+
 class ResultBoolResponse(Response):
     result: bool
