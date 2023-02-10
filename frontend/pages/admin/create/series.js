@@ -16,7 +16,8 @@ import {
   RadioGroup, Radio, InputRightElement,
   InputGroup,
   IconButton, Stack,
-  useToast
+  useToast,
+  Image
 } from "@chakra-ui/react";
 import Form from "@/components/form";
 import {Search2Icon} from "@chakra-ui/icons";
@@ -39,8 +40,8 @@ export async function getServerSideProps(context) {
 }
 
 export default function SeriesCreateForm({token}) {
-  let [body, setBody] = useState({name: "", description: "", thumbnail: null, posts: [], tags: [], hidden: false});
-  let [prevBody, setPrevBody] = useState({name: "", description: "", thumbnail: null, posts: [], tags: [], hidden: false});
+  let [body, setBody] = useState({name: "", description: "", thumbnail: "", posts: [], tags: [], hidden: false});
+  let [prevBody, setPrevBody] = useState({name: "", description: "", thumbnail: "", posts: [], tags: [], hidden: false});
   let [uniqueTitle, setUniqueT] = useState(true);
 
   let [postIdDict, setPostIdDict] = useState({});
@@ -57,6 +58,8 @@ export default function SeriesCreateForm({token}) {
   let tagSelectorOpenerRef = useRef();
   let [selectedPost, setSelectedPost] = useState("");
   let [selectedTag, setSelectedTag] = useState("");
+
+  let thumbnailSelectorRef = useRef();
 
   let router = useRouter();
   let {pid} = router.query;
@@ -184,6 +187,8 @@ export default function SeriesCreateForm({token}) {
     })
   }
 
+  console.log(body);
+
   return <DefaultLayout>
     <style jsx global>{`
       body {
@@ -257,6 +262,28 @@ export default function SeriesCreateForm({token}) {
             <FormControl id={"description"} mb={"20px"}>
               <FormLabel>Description</FormLabel>
               <Input type={"text"} value={body.description} onChange={(e) => {setBody({...body, description: e.target.value})}} />
+            </FormControl>
+            <FormControl id={"thumbnail"} mb={"20px"}>
+              <FormLabel>Thumbnail</FormLabel>
+              {
+                body.thumbnail !== "" && body.thumbnail !== null
+                  ? <Image src={`https://cdn.sserve.work/${body.thumbnail}`} w={"100%"} maxW={"400px"} h={"auto"} mb={"10px"} alt={"Thumbnail"} />
+                  : <></>
+              }
+              <FormHelperText>{body.thumbnail !== "" && body.thumbnail !== null ? body.thumbnail : "Not Set"}</FormHelperText>
+              <Input type={"file"} display={"none"} ref={thumbnailSelectorRef} onChange={(e) => {
+                const formData = new FormData();
+                formData.append("file", e.target.files[0]);
+                fetch("/cdn/upload", {
+                  method: "POST",
+                  body: formData
+                }).then(res => res.json()).then(data => {
+                  setBody({...body, thumbnail: `${data.hash}.${e.target.files[0].type.split("/")[1]}`});
+                })
+              }} />
+              <Button colorScheme={"blue"} onClick={() => {
+                thumbnailSelectorRef.current.click();
+              }}>Upload</Button>
             </FormControl>
             <FormControl id={"posts"} mb={"20px"}>
               <FormLabel>Posts</FormLabel>
