@@ -97,19 +97,18 @@ export default function SeriesCreateForm({token}) {
         return {...prev, posts: data}
       });
 
-      let postDict = {};
       for (let post of data) {
         fetch(`/api/post/${post}/light`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           }
-        }).then(res => res.json()).then(data => {
-          postDict[post] = data;
+        }).then(res => res.json()).then(postdata => {
+          setPostIdDict(prev => {
+            return {...prev, [post]: postdata}
+          })
         })
       }
-
-      setPostIdDict(postDict);
     })
 
     fetch(`/api/series/${pid}/get-tags`, {
@@ -124,21 +123,18 @@ export default function SeriesCreateForm({token}) {
       setBody(prev => {
         return {...prev, tags: data}
       });
-
-      let tagDict = {};
-
       for (let tag of data) {
         fetch(`/api/tag/${tag}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           }
-        }).then(res => res.json()).then(data => {
-          tagDict[tag] = data;
+        }).then(res => res.json()).then(tagdata => {
+          setTagIdDict(prev => {
+            return {...prev, [tag]: tagdata}
+          })
         })
       }
-
-      setTagIdDict(tagDict);
     })
   }, [pid]);
 
