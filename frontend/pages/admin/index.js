@@ -78,9 +78,10 @@ export default function Admin({token}) {
       alignItems="center"
       position={"sticky"}
       top={"0"}
-      w={"100vw"}
+      w={"100%"}
       p={"10px"}
       zIndex={"50"}
+      boxSizing={"border-box"}
     >
       <Menu>
         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Create</MenuButton>
@@ -104,7 +105,7 @@ export default function Admin({token}) {
       justifyContent="flex-start"
       alignItems="center"
       marginTop={"40px"}
-      p={"50px"}
+      marginBottom={"40px"}
       gap={"20px"}
     >
       {

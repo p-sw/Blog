@@ -17,7 +17,7 @@ export default function Navigation() {
       flexDirection={"row"}
       alignItems={"center"}
       justifyContent={"space-around"}
-      width={"100vw"}
+      width={"100%"}
       height={"7vh"}
       bgColor={"navbg"}
       boxShadow={"undernav"}

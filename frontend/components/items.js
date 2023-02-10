@@ -14,13 +14,15 @@ import {
   IconButton
 } from "@chakra-ui/react";
 import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
-import {AiFillDelete} from "react-icons/ai";
+import {AiFillDelete, AiFillEdit} from "react-icons/ai";
 import {FaExternalLinkAlt} from "react-icons/fa";
 
 export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
   let router = useRouter();
 
-  return <Card direction={"row"} w={"100%"} h={"250px"} boxSizing={"border-box"}>
+  function deleteThis() {}
+
+  return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"}>
     <Skeleton h={"100%"} w={"400px"}></Skeleton>
     <Flex direction={"column"} w={"100%"}>
       <CardBody>
@@ -33,7 +35,7 @@ export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
           <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
           <MenuList>
             <MenuItem onClick={async () => {await router.push(`/admin/create/post?pid=${post.id}`)}}>Edit</MenuItem>
-            <MenuItem onClick={async () => {}}>Delete</MenuItem>
+            <MenuItem onClick={deleteThis}>Delete</MenuItem>
           </MenuList>
         </Menu>
         {
@@ -49,7 +51,11 @@ export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
 export function AdminSeriesItem({series}) {
   let router = useRouter();
 
-  return <Card direction={"row"} w={"100%"} h={"250px"} boxSizing={"border-box"}>
+  function deleteThis() {
+
+  }
+
+  return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"}>
     <Skeleton h={"100%"} w={"400px"}></Skeleton>
     <Flex direction={"column"} w={"100%"}>
       <CardBody>
@@ -57,12 +63,12 @@ export function AdminSeriesItem({series}) {
         <Text>{series.description}</Text>
       </CardBody>
       <CardFooter gap={"10px"}>
-        <Button onClick={async () => await router.push(`/series/${series.id}`)}>View</Button>
+        <IconButton onClick={async () => await router.push(`/series/${series.id}`)} icon={<Icon as={FaExternalLinkAlt} />} aria-label={"view"} />
         <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Action</MenuButton>
+          <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
           <MenuList>
             <MenuItem onClick={async () => {await router.push(`/admin/create/series?pid=${series.id}`)}}>Edit</MenuItem>
-            <MenuItem onClick={async () => {}}>Delete</MenuItem>
+            <MenuItem onClick={deleteThis}>Delete</MenuItem>
           </MenuList>
         </Menu>
       </CardFooter>
@@ -73,19 +79,28 @@ export function AdminSeriesItem({series}) {
 export function AdminTagItem({tag, inseries=false, onDeleteInSeries}) {
   let router = useRouter();
 
-  return <Card direction={"row"} boxSizing={"border-box"} p={"20px"}>
+  function deleteThis() {}
+
+  return <Card direction={"row"} boxSizing={"border-box"} p={"20px"} w={"90%"} maxW={"400px"}>
     <Flex direction={"column"} w={"100%"} alignItems={"center"} justifyContent={"center"}>
       <CardBody textAlign={"center"}>
         <Heading fontSize={"3xl"} fontWeight={"bold"}>{tag.name}</Heading>
       </CardBody>
       <CardFooter gap={"10px"}>
-        <Menu>
-          <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
-          <MenuList>
-            <MenuItem onClick={async () => {await router.push(`/admin/create/tag?pid=${tag.id}`)}}>Edit</MenuItem>
-            <MenuItem onClick={async () => {}}>Delete</MenuItem>
-          </MenuList>
-        </Menu>
+        {
+          !inseries
+            ? <>
+              <IconButton icon={<Icon as={AiFillEdit} />} aria-label={"edit"} onClick={async () => {await router.push(`/admin/create/tag?pid=${tag.id}`)}} />
+              <IconButton icon={<Icon as={AiFillDelete} />} aria-label={"delete"} onClick={deleteThis} />
+            </>
+            : <Menu>
+              <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
+              <MenuList>
+                <MenuItem onClick={async () => {await router.push(`/admin/create/tag?pid=${tag.id}`)}}>Edit</MenuItem>
+                <MenuItem onClick={deleteThis}>Delete</MenuItem>
+              </MenuList>
+            </Menu>
+        }
         {
           inseries
             ? <IconButton icon={<Icon as={AiFillDelete} />} aria-label={"delete"} onClick={onDeleteInSeries} />

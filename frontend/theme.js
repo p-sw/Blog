@@ -49,7 +49,7 @@ const theme = extendTheme({
     styles: {
         global: (props) => ({
             "html,body": {
-                width: "100vw",
+                width: "100%",
                 fontSize: "20px",
                 fontFamily: "keep-font",
                 bgColor: "mainbg",
