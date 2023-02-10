@@ -267,11 +267,14 @@ export default function SeriesCreateForm({token}) {
               body.posts.length !== 0
                 ? body.posts.map((post_id) => {
                     if (postIdDict[post_id]) {
-                      return <AdminPostItem key={post_id} post={postIdDict[post_id]} inseries={true} />
+                      return <AdminPostItem key={post_id} post={postIdDict[post_id]} inseries={true} onDeleteInSeries={() => {
+                        let new_posts = body.posts.filter((id) => id !== post_id);
+                        setBody({...body, posts: new_posts});
+                      }} />
                     }
-                    return <Text key={post_id}></Text>;
+                    return <Text key={post_id}>Loading...</Text>;
                   })
-                : <Text>BodyEmpty</Text>
+                : <Text>No Posts</Text>
               }
               </Stack>
               <Drawer
@@ -322,11 +325,14 @@ export default function SeriesCreateForm({token}) {
                 body.tags.length !== 0
                   ? body.tags.map((tag_id) => {
                       if (tagIdDict[tag_id]) {
-                        return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} inseries={true} />
+                        return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} inseries={true} onDeleteInSeries={() => {
+                          let new_tags = body.tags.filter((id) => id !== tag_id);
+                          setBody({...body, tags: new_tags});
+                        }} />
                       }
-                      return <Text key={tag_id}></Text>;
+                      return <Text key={tag_id}>Loading..</Text>;
                     })
-                  : <Text>BodyEmpty</Text>
+                  : <Text>No Tags</Text>
               }
               </Stack>
               <Drawer
@@ -372,7 +378,7 @@ export default function SeriesCreateForm({token}) {
               <FormLabel>Hidden</FormLabel>
               <Checkbox isChecked={body.hidden} onChange={(e) => {setBody({...body, hidden: e.target.checked})}} />
             </FormControl>
-            <Input type={"submit"} value={"Add"}/>
+            <Input type={"submit"} value={"Save"}/>
           </Form>
         </Box>
       </Box>

@@ -17,7 +17,7 @@ import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
 import {AiFillDelete} from "react-icons/ai";
 import {FaExternalLinkAlt} from "react-icons/fa";
 
-export function AdminPostItem({post, inseries=false}) {
+export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
   let router = useRouter();
 
   return <Card direction={"row"} w={"100%"} h={"250px"} boxSizing={"border-box"}>
@@ -38,7 +38,7 @@ export function AdminPostItem({post, inseries=false}) {
         </Menu>
         {
           inseries
-            ? <IconButton onClick={async () => {}} icon={<Icon as={AiFillDelete} />} aria-label={"delete"} />
+            ? <IconButton icon={<Icon as={AiFillDelete} />} aria-label={"delete"} onClick={onDeleteInSeries} />
             : null
         }
       </CardFooter>
@@ -70,7 +70,7 @@ export function AdminSeriesItem({series}) {
   </Card>
 }
 
-export function AdminTagItem({tag, inseries=false}) {
+export function AdminTagItem({tag, inseries=false, onDeleteInSeries}) {
   let router = useRouter();
 
   return <Card direction={"row"} boxSizing={"border-box"} p={"20px"}>
@@ -88,7 +88,7 @@ export function AdminTagItem({tag, inseries=false}) {
         </Menu>
         {
           inseries
-            ? <IconButton onClick={async () => {}} icon={<Icon as={AiFillDelete} />} aria-label={"delete"} />
+            ? <IconButton icon={<Icon as={AiFillDelete} />} aria-label={"delete"} onClick={onDeleteInSeries} />
             : null
         }
       </CardFooter>
