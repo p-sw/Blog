@@ -24,11 +24,6 @@ class TokenRequest(Request):
 class TokenResponse(Response):
     token: str
 
-Light_Post_Frontmatter = pydantic_model_creator(
-    Post,
-    exclude=("content", "series"),
-)
-
 SinglePostResponse = pydantic_model_creator(
     Post,
 )
@@ -50,8 +45,22 @@ class PostCreateRequest(Request):
     series_id: int | None
     tags: list[int] | None
 
+class PostUpdateRequest(Request):
+    id: int
+    title: str | None
+    description: str | None
+    content: str | None
+    hidden: bool | None
+    thumbnail: str | None
+    series_id: int | None
+    tags: list[int] | None
+
 class TagCreateRequest(Request):
     name: str
+
+class TagUpdateRequest(Request):
+    id: int
+    name: str | None
 
 class SeriesCreateRequest(Request):
     name: str
@@ -69,6 +78,9 @@ class SeriesUpdateRequest(Request):
     posts: list[int] | None
     tags: list[int] | None
     hidden: bool | None
+
+class SeriesIdResponse(Response):
+    id: int | None
 
 class ResultBoolResponse(Response):
     result: bool

@@ -20,9 +20,11 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerHeader, DrawerContent, DrawerFooter,
-  useToast
+  useToast, InputRightElement, IconButton, InputGroup, Divider, Stack, Radio, RadioGroup, Image, Text
 } from "@chakra-ui/react";
 import {useRouter} from "next/router";
+import {Search2Icon} from "@chakra-ui/icons";
+import {AdminSeriesItem, AdminTagItem} from "@/components/items";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
@@ -41,15 +43,25 @@ export async function getServerSideProps(context) {
 }
 
 export default function PostCreateForm({token}) {
-  let [body, setBody] = useState({title: "", description: "", content: "", hidden: false, series_id: null, tags: null, thumbnail: null});
-  let [prevBody, setPrevBody] = useState({title: "", description: "", content: "", hidden: false});
+  let [body, setBody] = useState({title: "", description: "", content: "", hidden: false, series_id: null, tags: [], thumbnail: ""});
+  let [prevBody, setPrevBody] = useState({title: "", description: "", content: "", hidden: false, series_id: null, tags: [], thumbnail: ""});
   let [uniqueTitle, setUniqueT] = useState(true);
-  let [seriesName, setSeriesName] = useState("");
-  let [tags, setTags] = useState([]);
 
   let {isOpen: seriesSelectorOpened, onOpen: seriesSelectorOpen, onClose: seriesSelectorClose} = useDisclosure()
   let seriesOpenerRef = useRef()
   let {isOpen: tagSelectorOpened, onOpen: tagSelectorOpen, onClose: tagSelectorClose} = useDisclosure()
+  let tagOpenerRef = useRef()
+
+  let thumbnailSelectorRef = useRef()
+
+  let [seriesSearchResult, setSeriesSearchResult] = useState([]);
+  let [seriesSearchQuery, setSeriesSearchQuery] = useState("");
+  let [seriesIdDict, setSeriesIdDict] = useState({});
+  let [selectedSeries, setSelectedSeries] = useState("");
+  let [tagSearchResult, setTagSearchResult] = useState([]);
+  let [tagSearchQuery, setTagSearchQuery] = useState("");
+  let [tagIdDict, setTagIdDict] = useState({});
+  let [selectedTag, setSelectedTag] = useState("");
 
   let router = useRouter();
   let {pid} = router.query;
@@ -64,8 +76,62 @@ export default function PostCreateForm({token}) {
         "Content-Type": "application/json",
       }
     }).then(res => res.json()).then(data => {
-      setPrevBody(data);
-      setBody(data);
+      setPrevBody(prev => {
+        return {...prev, ...data};
+      });
+      setBody(prev => {
+        return {...prev, ...data};
+      });
+    })
+    fetch(`/api/post/${pid}/get-series`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(data => {
+      setPrevBody(prev => {
+        return {...prev, series_id: data.id};
+      })
+      setBody(prev => {
+        return {...prev, series_id: data.id};
+      })
+
+      if (data.id === null) return;
+      fetch(`/api/series/${data.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      }).then(res2 => res2.json()).then(seriesObj => {
+        setSeriesIdDict(prev => {
+          return {...prev, [data.id]: seriesObj}
+        })
+      })
+    })
+    fetch(`/api/post/${pid}/get-tags`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(data => {
+      setPrevBody(prev => {
+        return {...prev, tags: data}
+      });
+      setBody(prev => {
+        return {...prev, tags: data}
+      });
+      for (let tag of data) {
+        fetch(`/api/tag/${tag}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }).then(res => res.json()).then(tagdata => {
+          setTagIdDict(prev => {
+            return {...prev, [tag]: tagdata}
+          })
+        })
+      }
     })
   }, [pid])
 
@@ -80,6 +146,40 @@ export default function PostCreateForm({token}) {
       setUniqueT(data.result);
     })
   }, [body.title, token])
+
+  function searchSeries() {
+    fetch(`/api/series/search-by-name?query=${seriesSearchQuery}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token
+      }
+    }).then(res => res.json()).then(data => {
+      setSeriesSearchResult(data);
+      for (let i = 0; i < data.length; i++) {
+        setSeriesIdDict(prev => {
+          return {...prev, [data[i].id]: data[i]}
+        });
+      }
+    })
+  }
+
+  function searchTag() {
+    fetch(`/api/tag/search-by-name?query=${tagSearchQuery}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token
+      }
+    }).then(res => res.json()).then(data => {
+      setTagSearchResult(data);
+      for (let i = 0; i < data.length; i++) {
+        setTagIdDict(prev => {
+          return {...prev, [data[i].id]: data[i]}
+        });
+      }
+    })
+  }
 
 
   return <DefaultLayout>
@@ -105,8 +205,18 @@ export default function PostCreateForm({token}) {
         <Box>
           <Form action={"/api/post"} method={"POST"} submitHandler={(e) => {
             e.preventDefault();
+            let method = "POST";
+            let toastTitle = "Added";
+            let toastDescription = "Successfully added a post.";
+            let failedToastDescription = "Failed to add a post due to unexpected error.";
+            if (pid !== undefined) {
+              method = "PATCH";
+              toastTitle = "Updated";
+              toastDescription = "Successfully updated a post.";
+              failedToastDescription = "Failed to update a post due to unexpected error.";
+            }
             fetch("/api/post", {
-              method: "POST",
+              method: method,
               headers: {
                 "Content-Type": "application/json",
                 "token": token
@@ -115,17 +225,17 @@ export default function PostCreateForm({token}) {
             }).then(async res => {
               if (res.status === 200) {
                 toast({
-                  title: "Added",
-                  description: "Successfully added a post.",
+                  title: toastTitle,
+                  description: toastDescription,
                   status: "success",
                   isClosable: true,
                   duration: 3000
                 })
-                await router.push("/admin?t=tag")
+                await router.push("/admin?t=post")
               } else {
                 toast({
                   title: "Failed",
-                  description: "Failed to add a tag due to unexpected error.",
+                  description: failedToastDescription,
                   status: "error",
                   isClosable: true,
                   duration: 3000
@@ -135,7 +245,14 @@ export default function PostCreateForm({token}) {
           }}>
             <FormControl id={"series"} mb={"20px"}>
               <FormLabel>Series</FormLabel>
-              <Button onClick={seriesSelectorOpen} ref={seriesOpenerRef}>Select Series</Button>
+              <Button onClick={seriesSelectorOpen} ref={seriesOpenerRef} mb={"10px"}>Select Series</Button>
+              {
+                body.series_id !== null
+                  ? seriesIdDict[body.series_id] !== undefined
+                    ? <AdminSeriesItem series={seriesIdDict[body.series_id]} />
+                    : <FormHelperText>Loading...</FormHelperText>
+                  : <FormHelperText>No series selected.</FormHelperText>
+              }
               <Drawer
                 isOpen={seriesSelectorOpened}
                 onClose={seriesSelectorClose}
@@ -149,14 +266,56 @@ export default function PostCreateForm({token}) {
                   </DrawerHeader>
                   <DrawerBody>
                     <DrawerCloseButton />
-                    <Input type={"text"} value={seriesName} onChange={(e) => setSeriesName(e.target.value)}/>
+                    <InputGroup>
+                      <Input type={"Text"} value={seriesSearchQuery} onChange={(e) => {setSeriesSearchQuery(e.target.value)}} />
+                      <InputRightElement>
+                        <IconButton onClick={() => {searchSeries()}} icon={<Search2Icon />} aria-label={"Search"} />
+                      </InputRightElement>
+                    </InputGroup>
+                    <Divider mb={"20px"} mt={"20px"} />
+                    <RadioGroup onChange={setSelectedSeries} value={selectedSeries}>
+                      <Stack spacing={5} direction={"column"}>
+                      {
+                        seriesSearchResult
+                          ? seriesSearchResult.map((series, index) => <Radio key={index} value={series.id.toString()} colorScheme={"blue"}>{series.name}</Radio>)
+                          : null
+                      }
+                      </Stack>
+                    </RadioGroup>
                   </DrawerBody>
                   <DrawerFooter>
                     <Button variant={"outline"} mr={3} onClick={seriesSelectorClose}>Cancel</Button>
-                    <Button colorScheme={"blue"}>Save</Button>
+                    <Button colorScheme={"blue"} onClick={() => {
+                      setBody(prev => {
+                        return {...prev, series_id: parseInt(selectedSeries, 10)}
+                      });
+                      seriesSelectorClose();
+                    }}>Save</Button>
                   </DrawerFooter>
                 </DrawerContent>
               </Drawer>
+            </FormControl>
+            <FormControl id={"thumbnail"} mb={"20px"}>
+              <FormLabel>Thumbnail</FormLabel>
+              {
+                body.thumbnail !== "" && body.thumbnail !== null
+                  ? <Image src={`https://cdn.sserve.work/${body.thumbnail}`} w={"100%"} maxW={"400px"} h={"auto"} mb={"10px"} alt={"Thumbnail"} />
+                  : <></>
+              }
+              <FormHelperText>{body.thumbnail !== "" && body.thumbnail !== null ? body.thumbnail : "Not Set"}</FormHelperText>
+              <Input type={"file"} display={"none"} ref={thumbnailSelectorRef} onChange={(e) => {
+                const formData = new FormData();
+                formData.append("file", e.target.files[0]);
+                fetch("/cdn/upload", {
+                  method: "POST",
+                  body: formData
+                }).then(res => res.json()).then(data => {
+                  setBody({...body, thumbnail: `${data.hash}.${e.target.files[0].type.split("/")[1]}`});
+                })
+              }} />
+              <Button colorScheme={"blue"} onClick={() => {
+                thumbnailSelectorRef.current.click();
+              }}>Upload</Button>
             </FormControl>
             <FormControl id={"title"} mb={"20px"} isInvalid={!uniqueTitle && prevBody.title !== body.title}>
               <FormLabel>Title</FormLabel>
@@ -174,6 +333,64 @@ export default function PostCreateForm({token}) {
             <FormControl id={"content"} mb={"20px"}>
               <FormLabel>Content</FormLabel>
               <Textarea value={body.content} onChange={(e) => setBody({...body, content: e.target.value})} resize={"none"} h={"500px"} />
+            </FormControl>
+            <FormControl id={"tags"} mb={"20px"}>
+              <FormLabel>Tags</FormLabel>
+              <Button ref={tagOpenerRef} onClick={tagSelectorOpen}>Select Tags</Button>
+              <FormHelperText>Current Tags</FormHelperText>
+              <Stack direction={"column"} spacing={"5px"} display={"inline"} ml={"10px"}>
+              {
+                body.tags.length !== 0
+                  ? body.tags.map((tag_id) => {
+                      if (tagIdDict[tag_id]) {
+                        return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} inseries={true} onDeleteInSeries={() => {
+                          let new_tags = body.tags.filter((id) => id !== tag_id);
+                          setBody({...body, tags: new_tags});
+                        }} />
+                      }
+                      return <Text key={tag_id}>Loading..</Text>;
+                    })
+                  : <Text>No Tags</Text>
+              }
+              </Stack>
+              <Drawer
+                isOpen={tagSelectorOpened}
+                onClose={tagSelectorClose}
+                placement={"left"}
+                finalFocusRef={tagOpenerRef}
+              >
+                <DrawerOverlay />
+                <DrawerContent>
+                  <DrawerCloseButton />
+                  <DrawerHeader>Select Tags</DrawerHeader>
+                  <DrawerBody>
+                    <Text fontSize={"sm"} mb={"8px"}>Search for tag</Text>
+                    <InputGroup>
+                      <Input type={"Text"} value={tagSearchQuery} onChange={(e) => {setTagSearchQuery(e.target.value)}} />
+                      <InputRightElement>
+                        <IconButton onClick={() => {searchTag()}} icon={<Search2Icon />} aria-label={"Search"} />
+                      </InputRightElement>
+                    </InputGroup>
+                    <Divider mb={"20px"} mt={"20px"} />
+                    <RadioGroup onChange={setSelectedTag} value={selectedTag}>
+                      <Stack spacing={5} direction={"column"}>
+                      {
+                        tagSearchResult
+                          ? tagSearchResult.map((tag, index) => <Radio key={index} value={tag.id.toString()} colorScheme={"blue"}>{tag.name}</Radio>)
+                          : null
+                      }
+                      </Stack>
+                    </RadioGroup>
+                  </DrawerBody>
+                  <DrawerFooter>
+                    <Button variant={"outline"} mr={3} onClick={tagSelectorClose}>Cancel</Button>
+                    <Button colorScheme={"blue"} onClick={() => {
+                      setBody({...body, tags: [...body.tags, parseInt(selectedTag, 10)]});
+                      tagSelectorClose();
+                    }}>Add</Button>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
             </FormControl>
             <FormControl id={"hidden"} mb={"20px"}>
               <FormLabel>Hidden</FormLabel>

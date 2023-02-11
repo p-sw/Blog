@@ -79,10 +79,20 @@ export default function TagCreateForm({token}) {
           <Heading fontSize={"3xl"} fontWeight={"black"}>Create Tag</Heading>
         </Box>
         <Box>
-          <Form action={"/api/post"} method={"POST"} submitHandler={(e) => {
+          <Form action={"/api/tag"} method={"POST"} submitHandler={(e) => {
             e.preventDefault();
+            let method = "POST";
+            let toastTitle = "Added";
+            let toastDescription = "Successfully added a post.";
+            let failedToastDescription = "Failed to add a post due to unexpected error.";
+            if (pid !== undefined) {
+              method = "PATCH";
+              toastTitle = "Updated";
+              toastDescription = "Successfully updated a post.";
+              failedToastDescription = "Failed to update a post due to unexpected error.";
+            }
             fetch("/api/tag", {
-              method: "POST",
+              method: method,
               headers: {
                 "Content-Type": "application/json",
                 "token": token
@@ -91,8 +101,8 @@ export default function TagCreateForm({token}) {
             }).then(async res => {
               if (res.status === 200) {
                 toast({
-                  title: "Added",
-                  description: "Successfully added a tag.",
+                  title: toastTitle,
+                  description: toastDescription,
                   status: "success",
                   isClosable: true,
                   duration: 3000
@@ -101,7 +111,7 @@ export default function TagCreateForm({token}) {
               } else {
                 toast({
                   title: "Failed",
-                  description: "Failed to add a tag due to unexpected error.",
+                  description: failedToastDescription,
                   status: "error",
                   isClosable: true,
                   duration: 3000
@@ -118,7 +128,7 @@ export default function TagCreateForm({token}) {
                   : <FormHelperText>다른 포스트의 이름과 겹치지 않아야 합니다.</FormHelperText>
               }
             </FormControl>
-            <Input type={"submit"} value={"Add"}/>
+            <Input type={"submit"} value={"Save"}/>
           </Form>
         </Box>
       </Box>

@@ -11,7 +11,7 @@ import {
   MenuList,
   Skeleton,
   Text,
-  IconButton
+  IconButton, Image, Box
 } from "@chakra-ui/react";
 import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
 import {AiFillDelete, AiFillEdit} from "react-icons/ai";
@@ -22,8 +22,10 @@ export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
 
   function deleteThis() {}
 
-  return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"}>
-    <Skeleton h={"100%"} w={"400px"}></Skeleton>
+  return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
+    <Box w={"30%"} h={"auto"}>
+      <Image src={"https://cdn.sserve.work/"+post.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+    </Box>
     <Flex direction={"column"} w={"100%"}>
       <CardBody>
         <Heading fontSize={"3xl"} fontWeight={"bold"}>{post.title}</Heading>
@@ -56,7 +58,13 @@ export function AdminSeriesItem({series}) {
   }
 
   return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"}>
-    <Skeleton h={"100%"} w={"400px"}></Skeleton>
+    <Box w={"30%"} h={"auto"}>
+      {
+        series.thumbnail !== null && series.thumbnail !== ""
+          ? <Image src={"https://cdn.sserve.work/"+series.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+          : <Skeleton h={"100%"} w={"100%"} />
+      }
+    </Box>
     <Flex direction={"column"} w={"100%"}>
       <CardBody>
         <Heading fontSize={"3xl"} fontWeight={"bold"}>{series.name}</Heading>

@@ -101,7 +101,7 @@ export default function SeriesCreateForm({token}) {
       });
 
       for (let post of data) {
-        fetch(`/api/post/${post}/light`, {
+        fetch(`/api/post/${post}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -162,11 +162,11 @@ export default function SeriesCreateForm({token}) {
       }
     }).then(res => res.json()).then(data => {
       setPostSearchResult(data);
-      let data_id = {}
       for (let i = 0; i < data.length; i++) {
-        data_id[data[i].id] = data[i];
+        setPostIdDict(prev => {
+          return {...prev, [data[i].id]: data[i]};
+        });
       }
-      setPostIdDict({...postIdDict, ...data_id})
     })
   }
 
@@ -179,15 +179,13 @@ export default function SeriesCreateForm({token}) {
       }
     }).then(res => res.json()).then(data => {
       setTagSearchResult(data);
-      let data_id = {}
       for (let i = 0; i < data.length; i++) {
-        data_id[data[i].id] = data[i];
+        setTagIdDict(prev => {
+          return {...prev, [data[i].id]: data[i]};
+        });
       }
-      setTagIdDict({...tagIdDict, ...data_id})
     })
   }
-
-  console.log(body);
 
   return <DefaultLayout>
     <style jsx global>{`

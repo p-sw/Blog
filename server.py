@@ -30,14 +30,17 @@ Request & Response Model Section
 from pydantic_models import (
     UserLoginRequest,
     TokenRequest,
-    TokenResponse, ResultBoolResponse, SeriesCreateRequest, SingleSeriesResponse, SeriesUpdateRequest
-)
-from pydantic_models import (
-    Light_Post_Frontmatter,
+    TokenResponse,
+    ResultBoolResponse,
+    SeriesCreateRequest,
+    SingleSeriesResponse,
+    SeriesUpdateRequest,
     PostCreateRequest,
     TagCreateRequest,
     SingleTagResponse,
     SinglePostResponse,
+    PostUpdateRequest, TagUpdateRequest,
+    SeriesIdResponse,
 )
 
 logger.info("FastAPI Request & Response Initialized.")
@@ -148,13 +151,13 @@ from typing import List
 
 admin = APIRouter(dependencies=[Depends(admin_session)])
 
-@admin.get("/post", response_model=List[Light_Post_Frontmatter])
+@admin.get("/post", response_model=List[SinglePostResponse])
 async def get_posts(page: int = Query(1)):
     response = await \
-        Light_Post_Frontmatter.from_queryset(Post.filter(series=None).order_by("-id").limit(10).offset((page - 1) * 10))
+        SinglePostResponse.from_queryset(Post.filter(series=None).order_by("-id").limit(10).offset((page - 1) * 10))
     return response
 
-@admin.post("/post", response_model=Light_Post_Frontmatter)
+@admin.post("/post", response_model=SinglePostResponse)
 async def create_post(body: PostCreateRequest):
     post = await Post.create(
         title=body.title,
@@ -167,7 +170,31 @@ async def create_post(body: PostCreateRequest):
     if body.tags:
         for tag in body.tags:
             await post.tags.add((await Tag.get_or_create(name=tag))[0])
-    return await Light_Post_Frontmatter.from_tortoise_orm(post)
+    return await SinglePostResponse.from_tortoise_orm(post)
+
+@admin.patch("/post", response_model=SinglePostResponse)
+async def update_post(body: PostUpdateRequest):
+    post = await Post.get_or_none(id=body.id)
+    if post is None:
+        raise HTTPException(status_code=404, detail={"error": "Post not found."})
+    if body.title is not None:
+        post.title = body.title
+    if body.content is not None:
+        post.content = body.content
+    if body.description is not None:
+        post.description = body.description
+    if body.series_id is not None:
+        post.series_id = body.series_id
+    if body.thumbnail is not None:
+        post.thumbnail = body.thumbnail
+    if body.hidden is not None:
+        post.hidden = body.hidden
+    if body.tags is not None:
+        await post.tags.clear()
+        for tag in body.tags:
+            await post.tags.add(await Tag.get(id=tag))
+    await post.save()
+    return await SinglePostResponse.from_tortoise_orm(post)
 
 @admin.get("/post/unique-title", response_model=ResultBoolResponse)
 async def post_unique_title(query: str):
@@ -175,10 +202,10 @@ async def post_unique_title(query: str):
         return ResultBoolResponse(result=False)
     return ResultBoolResponse(result=True)
 
-@admin.get("/post/search-by-title", response_model=List[Light_Post_Frontmatter])
+@admin.get("/post/search-by-title", response_model=List[SinglePostResponse])
 async def post_search_by_title(query: str):
     response = await \
-        Light_Post_Frontmatter.from_queryset(Post.filter(title__icontains=query, series=None).order_by("-id"))
+        SinglePostResponse.from_queryset(Post.filter(title__icontains=query, series=None).order_by("-id"))
     return response
 
 @admin.get("/tag", response_model=List[SingleTagResponse])
@@ -192,6 +219,16 @@ async def create_tag(body: TagCreateRequest):
     tag = await Tag.create(
         name=body.name,
     )
+    return tag
+
+@admin.patch("/tag", response_model=SingleTagResponse)
+async def update_tag(body: TagUpdateRequest):
+    tag = await Tag.get_or_none(id=body.id)
+    if tag is None:
+        raise HTTPException(status_code=404, detail={"error": "Tag not found."})
+    if body.name is not None:
+        tag.name = body.name
+    await tag.save()
     return tag
 
 @admin.get("/tag/unique-name", response_model=ResultBoolResponse)
@@ -255,6 +292,12 @@ async def series_unique_name(query: str):
         return ResultBoolResponse(result=False)
     return ResultBoolResponse(result=True)
 
+@admin.get("/series/search-by-name", response_model=List[SingleSeriesResponse])
+async def series_search_by_name(query: str):
+    response = await \
+        SingleSeriesResponse.from_queryset(Series.filter(name__icontains=query).order_by("-id"))
+    return response
+
 logger.info("Admin Route Ready.")
 """
 General Section
@@ -268,12 +311,21 @@ async def get_single_post(post_id: int):
         raise HTTPException(status_code=404, detail={"error": "Post not found."})
     return await SinglePostResponse.from_tortoise_orm(post)
 
-@general.get("/post/{post_id}/light", response_model=Light_Post_Frontmatter)
-async def get_light_single_post(post_id: int):
+@general.get("/post/{post_id}/get-tags", response_model=List[int])
+async def get_post_tags(post_id: int):
+    post = await Post.get_or_none(id=post_id)
+    await post.fetch_related("tags")
+    return [tag.id for tag in post.tags]
+
+@general.get("/post/{post_id}/get-series", response_model=SeriesIdResponse)
+async def get_post_series(post_id: int):
     post = await Post.get_or_none(id=post_id)
     if post is None:
         raise HTTPException(status_code=404, detail={"error": "Post not found."})
-    return await Light_Post_Frontmatter.from_tortoise_orm(post)
+    await post.fetch_related("series")
+    if post.series is None:
+        return SeriesIdResponse(id=None)
+    return SeriesIdResponse(id=post.series.id)
 
 @general.get("/series/{series_id}", response_model=SingleSeriesResponse)
 async def get_single_series(series_id: int):
