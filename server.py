@@ -41,7 +41,8 @@ from pydantic_models import (
     SinglePostResponse,
     PostUpdateRequest, TagUpdateRequest,
     SeriesIdResponse,
-    PostSearchResult
+    PostSearchResult,
+    SeriesSearchResult,
 )
 
 logger.info("FastAPI Request & Response Initialized.")
@@ -258,16 +259,19 @@ async def tag_search_by_name(query: str):
         SingleTagResponse.from_queryset(Tag.filter(name__icontains=query).order_by("-id"))
     return response
 
-@admin.get("/series", response_model=List[SingleSeriesResponse])
+@admin.get("/series", response_model=SeriesSearchResult)
 async def get_series(page: int = Query(1), query_name: str = Query(None, alias="qn", title="query name"), query_tags: list[int] = Query(None, alias="qt", title="query tags")):
     queryset = Series.all()
     if query_name is not None:
         queryset = queryset.filter(name__icontains=query_name)
     if query_tags is not None:
         queryset = queryset.filter(tags__id__in=query_tags)
-    response = await \
-        SingleSeriesResponse.from_queryset(queryset.order_by("-id").limit(10).offset((page - 1) * 10))
-    return list({v.id: v for v in response}.values())
+    items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
+    max_page = (await queryset.count()) // 10 + 1
+    return SeriesSearchResult(
+        series=items,
+        max_page=max_page,
+    )
 
 @admin.post("/series", response_model=SingleSeriesResponse)
 async def create_series(body: SeriesCreateRequest):

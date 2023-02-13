@@ -94,5 +94,9 @@ class SeriesSearchRequest(Request):
     name: str | None
     tags: list[int] | None
 
+class SeriesSearchResult(Response):
+    series: list[SingleSeriesResponse]
+    max_page: int
+
 class ResultBoolResponse(Response):
     result: bool

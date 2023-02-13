@@ -80,7 +80,8 @@ export default function Admin({token}) {
           "token": token
         }
       }).then(response => response.json()).then(data => {
-        setSeries(data);
+        setSeries(data["series"]);
+        setMaxPage(data["max_page"]);
       })
     } else if (type === "tag") {
       fetch(`/api/tag?p=${page}&${searchQuery ? "qn="+searchQuery : ""}`, {
