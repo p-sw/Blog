@@ -43,6 +43,7 @@ from pydantic_models import (
     SeriesIdResponse,
     PostSearchResult,
     SeriesSearchResult,
+    TagSearchResult,
 )
 
 logger.info("FastAPI Request & Response Initialized.")
@@ -221,14 +222,17 @@ async def post_search_by_title(query: str):
         SinglePostResponse.from_queryset(Post.filter(title__icontains=query, series=None).order_by("-id"))
     return response
 
-@admin.get("/tag", response_model=List[SingleTagResponse])
+@admin.get("/tag", response_model=TagSearchResult)
 async def get_tags(page: int = Query(1, alias="p", title="page"), query_name: str = Query(None, alias="qn", title="query name")):
     queryset = Tag.all()
     if query_name is not None:
         queryset = queryset.filter(name__icontains=query_name)
-    response = await \
-        SingleTagResponse.from_queryset(queryset.order_by("-id").limit(10).offset((page - 1) * 10))
-    return list({v.id: v for v in response}.values())
+    items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
+    max_page = (await queryset.count()) // 10 + 1
+    return TagSearchResult(
+        tags=items,
+        max_page=max_page,
+    )
 
 @admin.post("/tag", response_model=SingleTagResponse)
 async def create_tag(body: TagCreateRequest):

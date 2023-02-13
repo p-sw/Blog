@@ -91,7 +91,8 @@ export default function Admin({token}) {
           "token": token
         }
       }).then(response => response.json()).then(data => {
-        setTags(data);
+        setTags(data["tags"]);
+        setTags(data["max_page"]);
       })
     }
     setSearchTrigger(false);

@@ -98,5 +98,9 @@ class SeriesSearchResult(Response):
     series: list[SingleSeriesResponse]
     max_page: int
 
+class TagSearchResult(Response):
+    tags: list[SingleTagResponse]
+    max_page: int
+
 class ResultBoolResponse(Response):
     result: bool
