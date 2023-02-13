@@ -27,7 +27,7 @@ async function getTag(token="", {p: page, qn: query_name}) {
     endpoint = "/api/tag"
   }
 
-  let query = `?p=${page}&qn=${query_name}`;
+  let query = `?p=${page}${query_name !== undefined ? "&qn="+query_name : ""}`;
 
   return await fetch("http://127.0.0.1:8000" + endpoint + query, {
     method: "GET",
