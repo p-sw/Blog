@@ -217,9 +217,9 @@ export default function Admin({token}) {
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Type</MenuButton>
             <MenuList>
-              <MenuItem onClick={async () => {setType("post")}}>Post</MenuItem>
-              <MenuItem onClick={async () => {setType("series")}}>Series</MenuItem>
-              <MenuItem onClick={async () => {setType("tag")}}>Tag</MenuItem>
+              <MenuItem onClick={async () => {setType("post");setSearchTrigger(true)}}>Post</MenuItem>
+              <MenuItem onClick={async () => {setType("series");setSearchTrigger(true)}}>Series</MenuItem>
+              <MenuItem onClick={async () => {setType("tag");setSearchTrigger(true)}}>Tag</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
