@@ -107,6 +107,20 @@ export default function Admin({token}) {
     type
   ])
 
+  function initSearch() {
+    setPage(1);
+    setSearchTrigger(true);
+    setSearchTags([]);
+    setSearchQuery("");
+    setTagSearchQuery("");
+    setTagSearchResult([]);
+  }
+
+  function changeTypeAs(t) {
+    setType(t);
+    initSearch();
+  }
+
   function tagSearch() {
     if (tagSearchQuery === "") {
       setTagSearchResult([]);
@@ -218,9 +232,9 @@ export default function Admin({token}) {
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Type</MenuButton>
             <MenuList>
-              <MenuItem onClick={async () => {setType("post");setSearchTrigger(true)}}>Post</MenuItem>
-              <MenuItem onClick={async () => {setType("series");setSearchTrigger(true)}}>Series</MenuItem>
-              <MenuItem onClick={async () => {setType("tag");setSearchTrigger(true)}}>Tag</MenuItem>
+              <MenuItem onClick={async () => {changeTypeAs("post")}}>Post</MenuItem>
+              <MenuItem onClick={async () => {changeTypeAs("series")}}>Series</MenuItem>
+              <MenuItem onClick={async () => {changeTypeAs("tag")}}>Tag</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
