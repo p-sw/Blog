@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    let series = await getTag(req.headers.hasOwnProperty("token") ? req.headers.token : "");
+    let series = await getTag(req.headers.hasOwnProperty("token") ? req.headers.token : "", req.query);
     res.status(series.status).json(await series.json());
   } else if (req.method === "POST") {
     if (!req.headers.hasOwnProperty("token")) {
@@ -21,13 +21,15 @@ export default async function handler(req, res) {
   }
 }
 
-async function getTag(token="") {
+async function getTag(token="", {p: page, qn: query_name}) {
   let endpoint = "/admin/tag"
   if (token === "") {
     endpoint = "/api/tag"
   }
 
-  return await fetch("http://127.0.0.1:8000" + endpoint, {
+  let query = `?p=${page}&qn=${query_name}`;
+
+  return await fetch("http://127.0.0.1:8000" + endpoint + query, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

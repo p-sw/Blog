@@ -16,6 +16,12 @@ const theme = extendTheme({
         "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", 
         "Segoe UI Emoji", "Segoe UI Symbol", sans-serif`
     },
+    space: {
+        navheight: "7vh"
+    },
+    sizes: {
+        navheight: "7vh"
+    },
     semanticTokens: {
         colors: {
             navbg: {
@@ -37,6 +43,16 @@ const theme = extendTheme({
                 default: "black",
                 _light: "black",
                 _dark: "white"
+            },
+            bordercolor: {
+                default: "gray.200",
+                _light: "gray.200",
+                _dark: "#333"
+            },
+            btnbg: {
+                default: "white",
+                _light: "white",
+                _dark: "#222"
             }
         },
         shadows: {
@@ -54,6 +70,9 @@ const theme = extendTheme({
                 fontFamily: "keep-font",
                 bgColor: "mainbg",
                 color: "mainfont"
+            },
+            "div#__next": {
+                paddingTop: "navheight",
             }
         }),
     },

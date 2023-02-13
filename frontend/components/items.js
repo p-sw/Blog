@@ -24,7 +24,11 @@ export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
 
   return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
     <Box w={"30%"} h={"auto"}>
-      <Image src={"https://cdn.sserve.work/"+post.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+      {
+        post.thumbnail !== null && post.thumbnail !== ""
+          ? <Image src={"https://cdn.sserve.work/"+post.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+          : <Skeleton h={"100%"} w={"100%"} />
+      }
     </Box>
     <Flex direction={"column"} w={"100%"}>
       <CardBody>

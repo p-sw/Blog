@@ -18,7 +18,7 @@ export default function Navigation() {
       alignItems={"center"}
       justifyContent={"space-around"}
       width={"100%"}
-      height={"7vh"}
+      height={"navheight"}
       bgColor={"navbg"}
       boxShadow={"undernav"}
       position={"fixed"}

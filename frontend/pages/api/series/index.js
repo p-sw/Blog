@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    let series = await getSeries(req.headers.hasOwnProperty("token") ? req.headers.token : "");
+    let series = await getSeries(req.headers.hasOwnProperty("token") ? req.headers.token : "", req.query);
     res.status(series.status).json(await series.json());
   } else if (req.method === "POST") {
     if (!req.headers.hasOwnProperty("token")) {
@@ -21,13 +21,15 @@ export default async function handler(req, res) {
   }
 }
 
-async function getSeries(token="") {
+async function getSeries(token="", {p: page, qn: query_name, qt: query_tags}) {
   let endpoint = "/admin/series"
   if (token === "") {
     endpoint = "/api/series"
   }
 
-  return await fetch("http://127.0.0.1:8000" + endpoint, {
+  let query = `?${page!==undefined?"p="+page+"&":""}${query_name!==undefined?"qn="+query_name+"&":""}${query_tags!==undefined?query_tags.map(tag => "qt="+tag).join("&"):""}`;
+
+  return await fetch("http://127.0.0.1:8000" + endpoint + query, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

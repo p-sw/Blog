@@ -82,5 +82,13 @@ class SeriesUpdateRequest(Request):
 class SeriesIdResponse(Response):
     id: int | None
 
+class PostSearchRequest(Request):
+    title: str | None
+    tags: list[int] | None
+
+class SeriesSearchRequest(Request):
+    name: str | None
+    tags: list[int] | None
+
 class ResultBoolResponse(Response):
     result: bool

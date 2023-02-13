@@ -152,10 +152,18 @@ from typing import List
 admin = APIRouter(dependencies=[Depends(admin_session)])
 
 @admin.get("/post", response_model=List[SinglePostResponse])
-async def get_posts(page: int = Query(1)):
+async def get_posts(
+        page: int = Query(1, alias="p", title="page"),
+        query_title: str = Query(None, alias="qn", title="query title"),
+        query_tags: list[int] = Query(None, alias="qt", title="query tags")):
+    queryset = Post.all()
+    if query_title is not None:
+        queryset = queryset.filter(title__icontains=query_title)
+    if query_tags is not None:
+        queryset = queryset.filter(tags__id__in=query_tags)
     response = await \
-        SinglePostResponse.from_queryset(Post.filter(series=None).order_by("-id").limit(10).offset((page - 1) * 10))
-    return response
+        SinglePostResponse.from_queryset(queryset.order_by("-id").limit(10).offset((page - 1) * 10))
+    return list({v.id: v for v in response}.values())
 
 @admin.post("/post", response_model=SinglePostResponse)
 async def create_post(body: PostCreateRequest):
@@ -209,10 +217,13 @@ async def post_search_by_title(query: str):
     return response
 
 @admin.get("/tag", response_model=List[SingleTagResponse])
-async def get_tags(page: int = Query(1)):
+async def get_tags(page: int = Query(1, alias="p", title="page"), query_name: str = Query(None, alias="qn", title="query name")):
+    queryset = Tag.all()
+    if query_name is not None:
+        queryset = queryset.filter(name__icontains=query_name)
     response = await \
-        SingleTagResponse.from_queryset(Tag.all().order_by("-id").limit(10).offset((page - 1) * 10))
-    return response
+        SingleTagResponse.from_queryset(queryset.order_by("-id").limit(10).offset((page - 1) * 10))
+    return list({v.id: v for v in response}.values())
 
 @admin.post("/tag", response_model=SingleTagResponse)
 async def create_tag(body: TagCreateRequest):
@@ -244,10 +255,15 @@ async def tag_search_by_name(query: str):
     return response
 
 @admin.get("/series", response_model=List[SingleSeriesResponse])
-async def get_series(page: int = Query(1)):
+async def get_series(page: int = Query(1), query_name: str = Query(None, alias="qn", title="query name"), query_tags: list[int] = Query(None, alias="qt", title="query tags")):
+    queryset = Series.all()
+    if query_name is not None:
+        queryset = queryset.filter(name__icontains=query_name)
+    if query_tags is not None:
+        queryset = queryset.filter(tags__id__in=query_tags)
     response = await \
-        SingleSeriesResponse.from_queryset(Series.all().order_by("-id").limit(10).offset((page - 1) * 10))
-    return response
+        SingleSeriesResponse.from_queryset(queryset.order_by("-id").limit(10).offset((page - 1) * 10))
+    return list({v.id: v for v in response}.values())
 
 @admin.post("/series", response_model=SingleSeriesResponse)
 async def create_series(body: SeriesCreateRequest):
