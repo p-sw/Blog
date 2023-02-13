@@ -86,6 +86,10 @@ class PostSearchRequest(Request):
     title: str | None
     tags: list[int] | None
 
+class PostSearchResult(Response):
+    posts: list[SinglePostResponse]
+    max_page: int
+
 class SeriesSearchRequest(Request):
     name: str | None
     tags: list[int] | None

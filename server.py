@@ -41,6 +41,7 @@ from pydantic_models import (
     SinglePostResponse,
     PostUpdateRequest, TagUpdateRequest,
     SeriesIdResponse,
+    PostSearchResult
 )
 
 logger.info("FastAPI Request & Response Initialized.")
@@ -151,7 +152,7 @@ from typing import List
 
 admin = APIRouter(dependencies=[Depends(admin_session)])
 
-@admin.get("/post", response_model=List[SinglePostResponse])
+@admin.get("/post", response_model=PostSearchResult)
 async def get_posts(
         page: int = Query(1, alias="p", title="page"),
         query_title: str = Query(None, alias="qn", title="query title"),
@@ -161,9 +162,12 @@ async def get_posts(
         queryset = queryset.filter(title__icontains=query_title)
     if query_tags is not None:
         queryset = queryset.filter(tags__id__in=query_tags)
-    response = await \
-        SinglePostResponse.from_queryset(queryset.order_by("-id").limit(10).offset((page - 1) * 10))
-    return list({v.id: v for v in response}.values())
+    items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
+    max_page = (await queryset.count()) // 10 + 1
+    return PostSearchResult(
+        posts=items,
+        max_page=max_page,
+    )
 
 @admin.post("/post", response_model=SinglePostResponse)
 async def create_post(body: PostCreateRequest):

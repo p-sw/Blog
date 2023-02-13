@@ -52,6 +52,7 @@ export default function Admin({token}) {
   let [searchTriggered, setSearchTrigger] = useState(true);
 
   let [page, setPage] = useState(1);
+  let [maxPage, setMaxPage] = useState(1);
 
   useEffect(() => {
     if (t === undefined || !t) return;
@@ -68,7 +69,8 @@ export default function Admin({token}) {
           "token": token
         }
       }).then(response => response.json()).then(data => {
-        setPosts(data);
+        setPosts(data["posts"]);
+        setMaxPage(data["max_page"]);
       })
     } else if (type === "series") {
       fetch(`/api/series?p=${page}&${searchQuery ? "qn="+searchQuery+"&" : ""}${searchTags.map(tag => "qt="+tag).join("&")}`, {
