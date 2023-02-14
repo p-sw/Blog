@@ -43,7 +43,7 @@ from pydantic_models import (
     SeriesIdResponse,
     PostSearchResult,
     SeriesSearchResult,
-    TagSearchResult, TagDeleteRequest,
+    TagSearchResult, DeleteRequest,
 )
 
 logger.info("FastAPI Request & Response Initialized.")
@@ -210,6 +210,17 @@ async def update_post(body: PostUpdateRequest):
     await post.save()
     return await SinglePostResponse.from_tortoise_orm(post)
 
+@admin.delete("/post")
+async def delete_post(body: DeleteRequest):
+    post = await Post.get_or_none(id=body.id)
+    if post is None:
+        raise HTTPException(status_code=404, detail={"error": "Post not found."})
+    post.series = None
+    await post.save()
+    await post.tags.clear()
+    await post.delete()
+    return ResultBoolResponse(result=True)
+
 @admin.get("/post/unique-title", response_model=ResultBoolResponse)
 async def post_unique_title(query: str):
     if await Post.filter(title=query).exists():
@@ -252,7 +263,7 @@ async def update_tag(body: TagUpdateRequest):
     return tag
 
 @admin.delete("/tag", response_model=ResultBoolResponse)
-async def delete_tag(body: TagDeleteRequest):
+async def delete_tag(body: DeleteRequest):
     tag = await Tag.get_or_none(id=body.id)
     if tag is None:
         raise HTTPException(status_code=404, detail={"error": "Tag not found."})
@@ -323,6 +334,16 @@ async def update_series(body: SeriesUpdateRequest):
             await series.tags.add(await Tag.get(id=tag))
     await series.save()
     return series
+
+@admin.delete("/series", response_model=ResultBoolResponse)
+async def delete_series(body: DeleteRequest):
+    series = await Series.get_or_none(id=body.id)
+    if series is None:
+        raise HTTPException(status_code=404, detail={"error": "Series not found."})
+    await Post.filter(series_id=series.id).update(series_id=None)
+    await series.tags.clear()
+    await series.delete()
+    return ResultBoolResponse(result=True)
 
 @admin.get("/series/unique-name", response_model=ResultBoolResponse)
 async def series_unique_name(query: str):

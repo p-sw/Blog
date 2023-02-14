@@ -17,10 +17,30 @@ import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
 import {AiFillDelete, AiFillEdit} from "react-icons/ai";
 import {FaExternalLinkAlt} from "react-icons/fa";
 
-export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
+export function AdminPostItem({post, inseries=false, onDeleteInSeries, token, refresh}) {
   let router = useRouter();
 
-  function deleteThis() {}
+  function deleteThis() {
+    fetch("/api/post", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token
+      },
+      body: JSON.stringify({
+        id: post.id
+      })
+    }).then(res => {
+      if (res.status === 200) {
+        refresh();
+        return true;
+      } else {
+        return res.json();
+      }
+    }).then(data => {
+      console.log(data);
+    })
+  }
 
   return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
     <Box w={"30%"} h={"auto"}>
@@ -54,11 +74,29 @@ export function AdminPostItem({post, inseries=false, onDeleteInSeries}) {
   </Card>
 }
 
-export function AdminSeriesItem({series}) {
+export function AdminSeriesItem({series, token, refresh}) {
   let router = useRouter();
 
   function deleteThis() {
-
+    fetch("/api/series", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token
+      },
+      body: JSON.stringify({
+        id: series.id
+      })
+    }).then(res => {
+      if (res.status === 200) {
+        refresh();
+        return true;
+      } else {
+        return res.json();
+      }
+    }).then(data => {
+      console.log(data);
+    })
   }
 
   return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"}>
@@ -104,6 +142,7 @@ export function AdminTagItem({tag, inseries=false, onDeleteInSeries, token, refr
     }).then(res => {
       if (res.status === 200) {
         refresh();
+        return true;
       } else {
         return res.json();
       }

@@ -253,19 +253,19 @@ export default function Admin({token}) {
         type === "post"
           ? posts !== null
             ? posts.length > 0
-              ? posts.map(post => <AdminPostItem key={post.id} post={post}/>)
+              ? posts.map(post => <AdminPostItem key={post.id} post={post} token={token} refresh={() => setSearchTrigger(true)} />)
               : <Text>No posts</Text>
             : <Text>Loading posts...</Text>
           : type === "series"
             ? series !== null
               ? series.length > 0
-                ? series.map(item => <AdminSeriesItem key={item.id} series={item}/>)
+                ? series.map(item => <AdminSeriesItem key={item.id} series={item} token={token} refresh={() => setSearchTrigger(true)} />)
                 : <Text>No series</Text>
               : <Text>Loading series...</Text>
             : type === "tag"
               ? tags !== null
                 ? tags.length > 0
-                  ? tags.map(tag => <AdminTagItem key={tag.id} tag={tag} token={token} refresh={() => {setSearchTrigger(true)}} />)
+                  ? tags.map(tag => <AdminTagItem key={tag.id} tag={tag} token={token} refresh={() => setSearchTrigger(true)} />)
                   : <Text>No tags</Text>
                 : <Text>Loading tags...</Text>
               : <Text>Unknown type</Text>

@@ -16,6 +16,13 @@ export default async function handler(req, res) {
     }
     let post = await updatePost(req.body, req.headers.token);
     res.status(post.status).json(await post.json());
+  } else if (req.method === "DELETE") {
+    if (!req.headers.hasOwnProperty("token")) {
+      res.status(401).json({message: "Unauthorized"});
+      return;
+    }
+    let post = await deletePost(req.body, req.headers.token);
+    res.status(post.status).json(await post.json());
   } else {
     res.status(405).json({message: "Method not allowed"});
   }
@@ -73,6 +80,19 @@ async function updatePost({id, title=null, description=null, content=null, thumb
       tags: tags,
       series_id: series_id,
       hidden: hidden
+    })
+  });
+}
+
+async function deletePost({id}, token) {
+  return await fetch("http://127.0.0.1:8000/admin/post", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "token": token
+    },
+    body: JSON.stringify({
+      id: id
     })
   });
 }
