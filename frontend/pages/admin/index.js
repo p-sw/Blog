@@ -265,7 +265,7 @@ export default function Admin({token}) {
             : type === "tag"
               ? tags !== null
                 ? tags.length > 0
-                  ? tags.map(tag => <AdminTagItem key={tag.id} tag={tag} />)
+                  ? tags.map(tag => <AdminTagItem key={tag.id} tag={tag} token={token} refresh={() => {setSearchTrigger(true)}} />)
                   : <Text>No tags</Text>
                 : <Text>Loading tags...</Text>
               : <Text>Unknown type</Text>

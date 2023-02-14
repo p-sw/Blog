@@ -62,6 +62,9 @@ class TagUpdateRequest(Request):
     id: int
     name: str | None
 
+class TagDeleteRequest(Request):
+    id: int
+
 class SeriesCreateRequest(Request):
     name: str
     description: str

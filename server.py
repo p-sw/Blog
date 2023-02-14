@@ -43,7 +43,7 @@ from pydantic_models import (
     SeriesIdResponse,
     PostSearchResult,
     SeriesSearchResult,
-    TagSearchResult,
+    TagSearchResult, TagDeleteRequest,
 )
 
 logger.info("FastAPI Request & Response Initialized.")
@@ -250,6 +250,16 @@ async def update_tag(body: TagUpdateRequest):
         tag.name = body.name
     await tag.save()
     return tag
+
+@admin.delete("/tag", response_model=ResultBoolResponse)
+async def delete_tag(body: TagDeleteRequest):
+    tag = await Tag.get_or_none(id=body.id)
+    if tag is None:
+        raise HTTPException(status_code=404, detail={"error": "Tag not found."})
+    await tag.posts.clear()
+    await tag.series.clear()
+    await tag.delete()
+    return ResultBoolResponse(result=True)
 
 @admin.get("/tag/unique-name", response_model=ResultBoolResponse)
 async def tag_unique_name(query: str):

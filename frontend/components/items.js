@@ -88,10 +88,29 @@ export function AdminSeriesItem({series}) {
   </Card>
 }
 
-export function AdminTagItem({tag, inseries=false, onDeleteInSeries}) {
+export function AdminTagItem({tag, inseries=false, onDeleteInSeries, token, refresh}) {
   let router = useRouter();
 
-  function deleteThis() {}
+  function deleteThis() {
+    fetch("/api/tag", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token,
+      },
+      body: JSON.stringify({
+        id: tag.id
+      })
+    }).then(res => {
+      if (res.status === 200) {
+        refresh();
+      } else {
+        return res.json();
+      }
+    }).then(data => {
+      console.log(data);
+    })
+  }
 
   return <Card direction={"row"} boxSizing={"border-box"} p={"20px"} w={"90%"} maxW={"400px"}>
     <Flex direction={"column"} w={"100%"} alignItems={"center"} justifyContent={"center"}>

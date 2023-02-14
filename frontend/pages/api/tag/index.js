@@ -16,6 +16,13 @@ export default async function handler(req, res) {
     }
     let series = await updateTag(req.body, req.headers.token);
     res.status(series.status).json(await series.json());
+  } else if (req.method === "DELETE") {
+    if (!req.headers.hasOwnProperty("token")) {
+      res.status(401).json({message: "Unauthorized"});
+      return;
+    }
+    let series = await deleteTag(req.body, req.headers.token);
+    res.status(series.status).json(await series.json());
   } else {
     res.status(405).json({message: "Method not allowed"});
   }
@@ -61,6 +68,19 @@ async function updateTag({id, name=null}, token) {
     body: JSON.stringify({
       id: id,
       name: name
+    })
+  })
+}
+
+async function deleteTag({id}, token) {
+  return await fetch("http://127.0.0.1:8000/admin/tag", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "token": token
+    },
+    body: JSON.stringify({
+      id: id
     })
   })
 }
