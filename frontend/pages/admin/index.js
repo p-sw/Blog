@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
-import {ChevronDownIcon, Search2Icon, AddIcon, Icon, ViewIcon} from "@chakra-ui/icons";
+import {Search2Icon, AddIcon, Icon, ViewIcon} from "@chakra-ui/icons";
 import {FaSlidersH} from "react-icons/fa";
 
 export async function getServerSideProps(context) {
