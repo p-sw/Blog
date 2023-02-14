@@ -34,7 +34,9 @@ async function getPosts(token="", {p: page, qn: query_name, qt: query_tags}) {
     endpoint = "/api/post"
   }
 
-  let query = `?${page!==undefined?"p="+page+"&":""}${query_name!==undefined?"qn="+query_name+"&":""}${query_tags!==undefined?query_tags.map(tag => "qt="+tag).join("&"):""}`;
+  let query = `?${page!==undefined?"p="+page+"&":""}`;
+  query = query + `${query_name!==undefined?"qn="+query_name+"&":""}`;
+  query = query + `${query_tags!==undefined?typeof query_tags==="string"?"qt="+query_tags:query_tags.map(tag=>"qt="+tag).join("&"):""}`;
 
   return await fetch("http://127.0.0.1:8000" + endpoint + query, {
     method: "GET",
