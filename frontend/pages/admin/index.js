@@ -317,9 +317,11 @@ export default function Admin({token}) {
           <Menu>
             <MenuButton as={IconButton} icon={<AddIcon />} />
             <MenuList>
-              <MenuItem onClick={async () => {await router.push("/admin/create/post")}}>Post</MenuItem>
-              <MenuItem onClick={async () => {await router.push("/admin/create/series")}}>Series</MenuItem>
-              <MenuItem onClick={async () => {await router.push("/admin/create/tag")}}>Tag</MenuItem>
+              <MenuGroup title={"Create"}>
+                <MenuItem onClick={async () => {await router.push("/admin/create/post")}}>Post</MenuItem>
+                <MenuItem onClick={async () => {await router.push("/admin/create/series")}}>Series</MenuItem>
+                <MenuItem onClick={async () => {await router.push("/admin/create/tag")}}>Tag</MenuItem>
+              </MenuGroup>
             </MenuList>
           </Menu>
         </Flex>
@@ -333,9 +335,11 @@ export default function Admin({token}) {
           <Menu>
             <MenuButton as={IconButton} icon={<ViewIcon />} />
             <MenuList>
-              <MenuItem onClick={async () => {changeTypeAs("post")}}>Post</MenuItem>
-              <MenuItem onClick={async () => {changeTypeAs("series")}}>Series</MenuItem>
-              <MenuItem onClick={async () => {changeTypeAs("tag")}}>Tag</MenuItem>
+              <MenuGroup title={"View"}>
+                <MenuItem onClick={async () => {changeTypeAs("post")}}>Post</MenuItem>
+                <MenuItem onClick={async () => {changeTypeAs("series")}}>Series</MenuItem>
+                <MenuItem onClick={async () => {changeTypeAs("tag")}}>Tag</MenuItem>
+              </MenuGroup>
             </MenuList>
           </Menu>
         </Flex>
