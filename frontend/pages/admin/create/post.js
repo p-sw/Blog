@@ -249,7 +249,14 @@ export default function PostCreateForm({token}) {
               {
                 body.series_id !== null
                   ? seriesIdDict[body.series_id] !== undefined
-                    ? <AdminSeriesItem series={seriesIdDict[body.series_id]} />
+                    ? <AdminSeriesItem
+                      series={seriesIdDict[body.series_id]}
+                      token={token}
+                      refresh={() => {
+                        setBody(prev => {return {...prev, series_id: null}});
+                        setSeriesIdDict({});
+                      }}
+                    />
                     : <FormHelperText>Loading...</FormHelperText>
                   : <FormHelperText>No series selected.</FormHelperText>
               }
@@ -343,10 +350,25 @@ export default function PostCreateForm({token}) {
                 body.tags.length !== 0
                   ? body.tags.map((tag_id) => {
                       if (tagIdDict[tag_id]) {
-                        return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} inseries={true} onDeleteInSeries={() => {
-                          let new_tags = body.tags.filter((id) => id !== tag_id);
-                          setBody({...body, tags: new_tags});
-                        }} />
+                        return <AdminTagItem
+                          key={tag_id}
+                          tag={tagIdDict[tag_id]}
+                          inseries={true}
+                          onDeleteInSeries={() => {
+                            let new_tags = body.tags.filter((id) => id !== tag_id);
+                            setBody({...body, tags: new_tags});
+                          }}
+                          token={token}
+                          refresh={() => {
+                            setTagIdDict(prev => {
+                              delete prev[tag_id];
+                              return prev;
+                            });
+                            setBody(prev => {
+                              return {...prev, tags: prev.tags.filter((id) => id !== tag_id)}
+                            });
+                          }}
+                        />
                       }
                       return <Text key={tag_id}>Loading..</Text>;
                     })

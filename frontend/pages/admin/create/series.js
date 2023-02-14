@@ -292,10 +292,25 @@ export default function SeriesCreateForm({token}) {
               body.posts.length !== 0
                 ? body.posts.map((post_id) => {
                     if (postIdDict[post_id]) {
-                      return <AdminPostItem key={post_id} post={postIdDict[post_id]} inseries={true} onDeleteInSeries={() => {
-                        let new_posts = body.posts.filter((id) => id !== post_id);
-                        setBody({...body, posts: new_posts});
-                      }} />
+                      return <AdminPostItem
+                        key={post_id}
+                        post={postIdDict[post_id]}
+                        inseries={true}
+                        onDeleteInSeries={() => {
+                          let new_posts = body.posts.filter((id) => id !== post_id);
+                          setBody({...body, posts: new_posts});
+                        }}
+                        token={token}
+                        refresh={() => {
+                          setPostIdDict(prev => {
+                            delete prev[post_id];
+                            return prev;
+                          });
+                          setBody((prev) => {
+                            return {...prev, posts: prev.posts.filter((id) => id !== post_id)};
+                          });
+                        }}
+                      />
                     }
                     return <Text key={post_id}>Loading...</Text>;
                   })
@@ -350,10 +365,26 @@ export default function SeriesCreateForm({token}) {
                 body.tags.length !== 0
                   ? body.tags.map((tag_id) => {
                       if (tagIdDict[tag_id]) {
-                        return <AdminTagItem key={tag_id} tag={tagIdDict[tag_id]} inseries={true} onDeleteInSeries={() => {
-                          let new_tags = body.tags.filter((id) => id !== tag_id);
-                          setBody({...body, tags: new_tags});
-                        }} />
+                        return <AdminTagItem
+                          key={tag_id}
+                          tag={tagIdDict[tag_id]}
+                          inseries={true}
+                          onDeleteInSeries={() => {
+                            let new_tags = body.tags.filter((id) => id !== tag_id);
+                            setBody({...body, tags: new_tags});
+                          }}
+                          token={token}
+                          refresh={() => {
+                            // tagIdDict is a dict, and I want to remove the tag with id of tag_id
+                            setTagIdDict(prev => {
+                              delete prev[tag_id];
+                              return prev;
+                            });
+                            setBody(prev => {
+                              return {...prev, tags: prev.tags.filter((id) => id !== tag_id)};
+                            });
+                          }}
+                        />
                       }
                       return <Text key={tag_id}>Loading..</Text>;
                     })
