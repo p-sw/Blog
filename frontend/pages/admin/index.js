@@ -9,7 +9,8 @@ import {
   MenuItem,
   MenuList,
   Text,
-  Input, Tag, InputGroup, InputRightElement
+  Input, Tag, InputGroup, InputRightElement,
+  useToast
 } from "@chakra-ui/react";
 import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
@@ -55,6 +56,8 @@ export default function Admin({token}) {
   let [page, setPage] = useState(1);
   let [maxPage, setMaxPage] = useState(1);
 
+  let toast = useToast();
+
   useEffect(() => {
     if (t === undefined || !t) return;
     setType(t);
@@ -69,7 +72,31 @@ export default function Admin({token}) {
           "Content-Type": "application/json",
           "token": token
         }
-      }).then(response => response.json()).then(data => {
+      }).then(response => {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 401) {
+          toast({
+            title: "Unauthorized",
+            description: "You are not authorized to access this page.",
+            status: "error",
+            duration: 5000,
+            isClosable: false,
+          })
+          router.push("/admin/login");
+          return null;
+        } else {
+          toast({
+            title: `Error: ${response.status}`,
+            description: `An error has occurred - ${response.statusText}`,
+            status: "error",
+            duration: 5000,
+            isClosable: false,
+          })
+          return null;
+        }
+      }).then(data => {
+        if (data === null) return;
         setPosts(data["posts"]);
         setMaxPage(data["max_page"]);
       })
@@ -80,7 +107,31 @@ export default function Admin({token}) {
           "Content-Type": "application/json",
           "token": token
         }
-      }).then(response => response.json()).then(data => {
+      }).then(response => {
+        if (response.status === 200) {
+          return response.json()
+        } else if (response.status === 401) {
+          toast({
+            title: "Unauthorized",
+            description: "You are not authorized to access this page.",
+            status: "error",
+            duration: 5000,
+            isClosable: false,
+          })
+          router.push("/admin/login");
+          return null;
+        } else {
+          toast({
+            title: `Error: ${response.status}`,
+            description: `An error has occurred - ${response.statusText}`,
+            status: "error",
+            duration: 5000,
+            isClosable: false,
+          })
+          return null;
+        }
+      }).then(data => {
+        if (data === null) return;
         setSeries(data["series"]);
         setMaxPage(data["max_page"]);
       })
@@ -91,7 +142,31 @@ export default function Admin({token}) {
           "Content-Type": "application/json",
           "token": token
         }
-      }).then(response => response.json()).then(data => {
+      }).then(response => {
+        if (response.status === 200) {
+          return response.json()
+        } else if (response.status === 401) {
+          toast({
+            title: "Unauthorized",
+            description: "You are not authorized to access this page.",
+            status: "error",
+            duration: 5000,
+            isClosable: false,
+          })
+          router.push("/admin/login");
+          return null;
+        } else {
+          toast({
+            title: `Error: ${response.status}`,
+            description: `An error has occurred - ${response.statusText}`,
+            status: "error",
+            duration: 5000,
+            isClosable: false,
+          })
+          return null;
+        }
+      }).then(data => {
+        if (data === null) return;
         setTags(data["tags"]);
         setMaxPage(data["max_page"]);
       })
@@ -134,7 +209,31 @@ export default function Admin({token}) {
         "Content-Type": "application/json",
         "token": token
       }
-    }).then(res => res.json()).then(data => {
+    }).then(res => {
+      if (res.status === 200) {
+        return res.json();
+      } else if (res.status === 401) {
+        toast({
+          title: "Unauthorized",
+          description: "You are not authorized to access this page.",
+          status: "error",
+          duration: 5000,
+          isClosable: false,
+        })
+        router.push("/admin/login");
+        return null;
+      } else {
+        toast({
+          title: `Error: ${res.status}`,
+          description: `An error has occurred - ${res.statusText}`,
+          status: "error",
+          duration: 5000,
+          isClosable: false,
+        })
+        return null;
+      }
+    }).then(data => {
+      if (data === null) return;
       for (let tag of data) {
         setTagIdDict((prev) => {
           return {...prev, [tag.id]: tag}
