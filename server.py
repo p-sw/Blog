@@ -183,7 +183,7 @@ async def create_post(body: PostCreateRequest):
     )
     if body.tags:
         for tag in body.tags:
-            await post.tags.add((await Tag.get_or_create(name=tag))[0])
+            await post.tags.add((await Tag.get(id=tag)))
     return await SinglePostResponse.from_tortoise_orm(post)
 
 @admin.patch("/post", response_model=SinglePostResponse)
@@ -310,7 +310,7 @@ async def create_series(body: SeriesCreateRequest):
             await Post.filter(id=post).update(series=series)
     if body.tags:
         for tag in body.tags:
-            await series.tags.add((await Tag.get_or_create(name=tag))[0])
+            await series.tags.add((await Tag.get(id=tag)))
     return series
 
 @admin.patch("/series", response_model=SingleSeriesResponse)
