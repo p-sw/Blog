@@ -399,6 +399,12 @@ async def get_series_tags(series_id: int):
     await series.fetch_related("tags")
     return [tag.id for tag in series.tags]
 
+@general.get("/tag/search-by-name", response_model=List[SingleTagResponse])
+async def tag_search_by_name(query: str):
+    response = await \
+        SingleTagResponse.from_queryset(Tag.filter(name__icontains=query).order_by("-id"))
+    return response
+
 @general.get("/tag/{tag_id}", response_model=SingleTagResponse)
 async def get_single_tag(tag_id: int):
     tag = await Tag.get_or_none(id=tag_id)
@@ -406,11 +412,6 @@ async def get_single_tag(tag_id: int):
         raise HTTPException(status_code=404, detail={"error": "Tag not found."})
     return await SingleTagResponse.from_tortoise_orm(tag)
 
-@general.get("/tag/search-by-name", response_model=List[SingleTagResponse])
-async def tag_search_by_name(query: str):
-    response = await \
-        SingleTagResponse.from_queryset(Tag.filter(name__icontains=query).order_by("-id"))
-    return response
 
 logger.info("General Route Ready.")
 """
