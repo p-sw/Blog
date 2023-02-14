@@ -13,7 +13,8 @@ import {
 } from "@chakra-ui/react";
 import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
-import {ChevronDownIcon, Search2Icon, AddIcon} from "@chakra-ui/icons";
+import {ChevronDownIcon, Search2Icon, AddIcon, Icon, ViewIcon} from "@chakra-ui/icons";
+import {FaSlidersH} from "react-icons/fa";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
@@ -159,7 +160,7 @@ export default function Admin({token}) {
       <GridItem colSpan={2} rowSpan={1}>
         <Flex direction={"row"} w={"100%"} h={"100%"} gap={"8px"}>
           <Menu closeOnSelect={false}>
-            <MenuButton as={IconButton} icon={<AddIcon />} aria-label={"Add Tag"} />
+            <MenuButton as={IconButton} icon={<Icon as={FaSlidersH} />} aria-label={"Add Tag"} />
             <MenuList p={"10px"}>
               <MenuGroup title={"Selected Tags"}>
                 {
@@ -215,7 +216,7 @@ export default function Admin({token}) {
           alignItems={"center"}
         >
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Create</MenuButton>
+            <MenuButton as={IconButton} icon={<AddIcon />} />
             <MenuList>
               <MenuItem onClick={async () => {await router.push("/admin/create/post")}}>Post</MenuItem>
               <MenuItem onClick={async () => {await router.push("/admin/create/series")}}>Series</MenuItem>
@@ -231,7 +232,7 @@ export default function Admin({token}) {
           alignItems={"center"}
         >
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>Type</MenuButton>
+            <MenuButton as={IconButton} icon={<ViewIcon />} />
             <MenuList>
               <MenuItem onClick={async () => {changeTypeAs("post")}}>Post</MenuItem>
               <MenuItem onClick={async () => {changeTypeAs("series")}}>Series</MenuItem>
