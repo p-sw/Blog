@@ -278,12 +278,6 @@ async def tag_unique_name(query: str):
         return ResultBoolResponse(result=False)
     return ResultBoolResponse(result=True)
 
-@admin.get("/tag/search-by-name", response_model=List[SingleTagResponse])
-async def tag_search_by_name(query: str):
-    response = await \
-        SingleTagResponse.from_queryset(Tag.filter(name__icontains=query).order_by("-id"))
-    return response
-
 @admin.get("/series", response_model=SeriesSearchResult)
 async def get_series(page: int = Query(1), query_name: str = Query(None, alias="qn", title="query name"), query_tags: list[int] = Query(None, alias="qt", title="query tags")):
     queryset = Series.all()
@@ -411,6 +405,12 @@ async def get_single_tag(tag_id: int):
     if tag is None:
         raise HTTPException(status_code=404, detail={"error": "Tag not found."})
     return await SingleTagResponse.from_tortoise_orm(tag)
+
+@general.get("/tag/search-by-name", response_model=List[SingleTagResponse])
+async def tag_search_by_name(query: str):
+    response = await \
+        SingleTagResponse.from_queryset(Tag.filter(name__icontains=query).order_by("-id"))
+    return response
 
 logger.info("General Route Ready.")
 """
