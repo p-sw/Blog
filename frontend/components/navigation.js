@@ -3,15 +3,18 @@ import {
     Heading,
     IconButton,
     Link,
-    useColorMode
+    useColorMode,
+    useDisclosure
 } from "@chakra-ui/react";
 import {
     MoonIcon,
-    SunIcon
+    SunIcon,
+    Search2Icon, CloseIcon
 } from "@chakra-ui/icons";
 
-export default function Navigation() {
+export default function Navigation({ searchBarEnabled=false, onSearchBarOpen=()=>{}, onSearchBarClose=()=>{} }) {
     let {colorMode, toggleColorMode} = useColorMode();
+    let {isOpen, onOpen, onClose} = useDisclosure();
 
     return <Flex
       flexDirection={"row"}
@@ -30,10 +33,32 @@ export default function Navigation() {
                 SV Devlog
             </Heading>
         </Link>
-        {
-            colorMode === 'light'
-              ? <IconButton aria-label={"Toggle Color Mode"} icon={<SunIcon />} onClick={toggleColorMode} />
-              : <IconButton aria-label={"Toggle Color Mode"} icon={<MoonIcon />} onClick={toggleColorMode} />
-        }
+        <Flex
+            direction={"row"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            height={"100%"}
+            bgColor={"navbg"}
+            gap={"5px"}
+        >
+            {
+                colorMode === 'light'
+                  ? <IconButton aria-label={"Toggle Color Mode"} icon={<SunIcon />} onClick={toggleColorMode} />
+                  : <IconButton aria-label={"Toggle Color Mode"} icon={<MoonIcon />} onClick={toggleColorMode} />
+            }
+            {
+                searchBarEnabled
+                  ? isOpen
+                    ? <IconButton aria-label={"Close Search Bar"} icon={<CloseIcon />} onClick={() => {
+                        onClose();
+                        onSearchBarClose();
+                    }} />
+                    : <IconButton aria-label={"Toggle Search Bar"} icon={<Search2Icon />} onClick={() => {
+                        onOpen();
+                        onSearchBarOpen();
+                    }} />
+                  : null
+            }
+        </Flex>
     </Flex>
 }

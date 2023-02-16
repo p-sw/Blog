@@ -1,8 +1,12 @@
 import Navigation from "@/components/navigation"
 
-function DefaultLayout({children}) {
+function DefaultLayout({children, searchBarEnabled=false, onSearchBarOpen=()=>{}, onSearchBarClose=()=>{} }) {
     return <>
-        <Navigation />
+        <Navigation
+          searchBarEnabled={searchBarEnabled}
+          onSearchBarOpen={onSearchBarOpen}
+          onSearchBarClose={onSearchBarClose}
+        />
         {children}
     </>
 }
