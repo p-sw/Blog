@@ -151,6 +151,7 @@ Route Section
 Admin Section
 """
 from typing import List
+from tortoise.functions import Count
 
 admin = APIRouter(dependencies=[Depends(admin_session)])
 
@@ -159,13 +160,13 @@ async def get_posts(
         page: int = Query(1, alias="p", title="page"),
         query_title: str = Query(None, alias="qn", title="query title"),
         query_tags: list[int] = Query(None, alias="qt", title="query tags")):
-    queryset = Post.all()
+    queryset = Post.all().distinct()
     if query_title is not None:
         queryset = queryset.filter(title__icontains=query_title)
     if query_tags is not None:
-        queryset = queryset.filter(tags__id__in=query_tags)
+        queryset = queryset.filter(tags__id__in=query_tags).annotate(tag_count=Count('tags')).filter(tag_count__gte=len(query_tags))
     items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
-    max_page = (await queryset.count()) // 10 + 1
+    max_page = await queryset.count() // 10 + 1
     return PostSearchResult(
         posts=items,
         max_page=max_page,
@@ -280,11 +281,11 @@ async def tag_unique_name(query: str):
 
 @admin.get("/series", response_model=SeriesSearchResult)
 async def get_series(page: int = Query(1), query_name: str = Query(None, alias="qn", title="query name"), query_tags: list[int] = Query(None, alias="qt", title="query tags")):
-    queryset = Series.all()
+    queryset = Series.all().distinct()
     if query_name is not None:
         queryset = queryset.filter(name__icontains=query_name)
     if query_tags is not None:
-        queryset = queryset.filter(tags__id__in=query_tags)
+        queryset = queryset.filter(tags__id__in=query_tags).annotate(count=Count("tags")).filter(count=len(query_tags))
     items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
     max_page = (await queryset.count()) // 10 + 1
     return SeriesSearchResult(
