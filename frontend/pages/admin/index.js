@@ -9,13 +9,12 @@ import {
   MenuItem,
   MenuList,
   Text,
-  Input, Tag, InputGroup, InputRightElement,
   useToast
 } from "@chakra-ui/react";
 import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
-import {Search2Icon, AddIcon, Icon, ViewIcon} from "@chakra-ui/icons";
-import {FaSlidersH} from "react-icons/fa";
+import {AddIcon, ViewIcon} from "@chakra-ui/icons";
+import SearchBar from "@/components/searchbar";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
@@ -45,9 +44,6 @@ export default function Admin({token}) {
 
   let [searchTags, setSearchTags] = useState([]);
   let [searchQuery, setSearchQuery] = useState("");
-
-  let [tagSearchQuery, setTagSearchQuery] = useState("");
-  let [tagSearchResult, setTagSearchResult] = useState([]);
 
   let [tagIdDict, setTagIdDict] = useState({});
 
@@ -189,58 +185,11 @@ export default function Admin({token}) {
     setSearchTrigger(true);
     setSearchTags([]);
     setSearchQuery("");
-    setTagSearchQuery("");
-    setTagSearchResult([]);
   }
 
   function changeTypeAs(t) {
     setType(t);
     initSearch();
-  }
-
-  function tagSearch() {
-    if (tagSearchQuery === "") {
-      setTagSearchResult([]);
-      return;
-    }
-    fetch(`/api/tag/search-by-name?query=${tagSearchQuery}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      }
-    }).then(res => {
-      if (res.status === 200) {
-        return res.json();
-      } else if (res.status === 401) {
-        toast({
-          title: "Unauthorized",
-          description: "You are not authorized to access this page.",
-          status: "error",
-          duration: 5000,
-          isClosable: false,
-        })
-        router.push("/admin/login");
-        return null;
-      } else {
-        toast({
-          title: `Error: ${res.status}`,
-          description: `An error has occurred - ${res.statusText}`,
-          status: "error",
-          duration: 5000,
-          isClosable: false,
-        })
-        return null;
-      }
-    }).then(data => {
-      if (data === null) return;
-      for (let tag of data) {
-        setTagIdDict((prev) => {
-          return {...prev, [tag.id]: tag}
-        })
-      }
-      setTagSearchResult(data.map((tag) => tag.id).filter((tag) => !searchTags.includes(tag)));
-    })
   }
 
   return <DefaultLayout>
@@ -257,56 +206,15 @@ export default function Admin({token}) {
       bgColor={"secondbg"}
     >
       <GridItem colSpan={2} rowSpan={1}>
-        <Flex direction={"row"} w={"100%"} h={"100%"} gap={"8px"}>
-          <Menu closeOnSelect={false}>
-            <MenuButton as={IconButton} icon={<Icon as={FaSlidersH} />} aria-label={"Add Tag"} />
-            <MenuList p={"10px"}>
-              <MenuGroup title={"Selected Tags"}>
-                {
-                  searchTags.map((tag) => {
-                    return <MenuItem key={tag} onClick={() => {
-                      setSearchTags(searchTags.filter((t) => t !== tag));
-                    }}><Tag size={"sm"} bgColor={"green.500"}>{tagIdDict[tag].name}</Tag></MenuItem>
-                  })
-                }
-              </MenuGroup>
-              <MenuGroup title={"Tag Search"}>
-                <InputGroup>
-                  <Input type={"text"} mb={"10px"} boxSizing={"border-box"} w={"auto"} maxW={"80vw"}
-                    value={tagSearchQuery}
-                    onChange={(e) => {
-                      setTagSearchQuery(e.target.value);
-                    }}
-                  />
-                  <InputRightElement>
-                    <IconButton aria-label={"Search"} icon={<Search2Icon />} onClick={tagSearch} />
-                  </InputRightElement>
-                </InputGroup>
-              </MenuGroup>
-              <MenuGroup title={"Tag Recommendations"}>
-                {
-                  tagSearchResult.map((tag) => {
-                    if (tagIdDict[tag] === undefined) {
-                      return null;
-                    }
-                    return <MenuItem key={tag} onClick={async () => {
-                      setSearchTags([...searchTags, tag]);
-                      setTagSearchResult(tagSearchResult.filter((t) => t !== tag));
-                    }}>{tagIdDict[tag].name}</MenuItem>
-                  })
-                }
-              </MenuGroup>
-            </MenuList>
-          </Menu>
-          <Input
-            placeholder={"Search by title"}
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
-          />
-          <IconButton aria-label={"Search"} icon={<Search2Icon />} onClick={() => {setSearchTrigger(true)}} />
-        </Flex>
+        <SearchBar
+          searchTags={searchTags}
+          setSearchTags={setSearchTags}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          tagIdDict={tagIdDict}
+          setTagIdDict={setTagIdDict}
+          searchHandler={() => {setSearchTrigger(true)}}
+        />
       </GridItem>
       <GridItem colSpan={1} rowSpan={1} boxSizing={"border-box"}>
         <Flex
