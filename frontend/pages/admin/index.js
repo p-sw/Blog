@@ -3,13 +3,15 @@ import {useEffect, useState} from "react";
 import DefaultLayout from "@/layouts/default";
 import {
   Button,
-  Flex, Grid, GridItem, IconButton,
+  Flex, IconButton,
   Menu,
   MenuButton, MenuGroup,
   MenuItem,
   MenuList,
   Text,
-  useToast
+  Box,
+  useToast,
+  useDisclosure
 } from "@chakra-ui/react";
 import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
@@ -53,6 +55,8 @@ export default function Admin({token}) {
   let [maxPage, setMaxPage] = useState(1);
 
   let toast = useToast();
+
+  let {isOpen: isSearchBarOpen, onOpen: onSearchBarOpen, onClose: onSearchBarClose} = useDisclosure();
 
   useEffect(() => {
     if (t === undefined || !t) return;
@@ -192,10 +196,15 @@ export default function Admin({token}) {
     initSearch();
   }
 
-  return <DefaultLayout>
-    <Grid
-      gridTemplateColumns={"repeat(2, 1fr)"}
-      gridTemplateRows={"repeat(2, 1fr)"}
+  return <DefaultLayout
+    searchBarEnabled={true}
+    onSearchBarOpen={onSearchBarOpen}
+    onSearchBarClose={onSearchBarClose}
+  >
+    <Flex
+      direction={"column"}
+      justifyContent={"flex-start"}
+      alignItems={"center"}
       position={"sticky"}
       top={"navheight"}
       w={"100%"}
@@ -205,54 +214,49 @@ export default function Admin({token}) {
       rowGap={"10px"}
       bgColor={"secondbg"}
     >
-      <GridItem colSpan={2} rowSpan={1}>
-        <SearchBar
-          searchTags={searchTags}
-          setSearchTags={setSearchTags}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          tagIdDict={tagIdDict}
-          setTagIdDict={setTagIdDict}
-          searchHandler={() => {setSearchTrigger(true)}}
-        />
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={1} boxSizing={"border-box"}>
-        <Flex
-          direction={"row"}
-          justifyContent={"flex-start"}
-          alignItems={"center"}
-        >
-          <Menu>
-            <MenuButton as={IconButton} icon={<AddIcon />} />
-            <MenuList>
-              <MenuGroup title={"Create"}>
-                <MenuItem onClick={async () => {await router.push("/admin/create/post")}}>Post</MenuItem>
-                <MenuItem onClick={async () => {await router.push("/admin/create/series")}}>Series</MenuItem>
-                <MenuItem onClick={async () => {await router.push("/admin/create/tag")}}>Tag</MenuItem>
-              </MenuGroup>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={1} boxSizing={"border-box"}>
-        <Flex
-          direction={"row"}
-          justifyContent={"flex-end"}
-          alignItems={"center"}
-        >
-          <Menu>
-            <MenuButton as={IconButton} icon={<ViewIcon />} />
-            <MenuList>
-              <MenuGroup title={"View"}>
-                <MenuItem onClick={async () => {changeTypeAs("post")}}>Post</MenuItem>
-                <MenuItem onClick={async () => {changeTypeAs("series")}}>Series</MenuItem>
-                <MenuItem onClick={async () => {changeTypeAs("tag")}}>Tag</MenuItem>
-              </MenuGroup>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </GridItem>
-    </Grid>
+      {
+        isSearchBarOpen
+          ? <Box w={"100%"}>
+              <SearchBar
+                searchTags={searchTags}
+                setSearchTags={setSearchTags}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                tagIdDict={tagIdDict}
+                setTagIdDict={setTagIdDict}
+                searchHandler={() => {setSearchTrigger(true)}}
+              />
+            </Box>
+          : null
+      }
+      <Flex
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        w={"100%"}
+      >
+        <Menu>
+          <MenuButton as={IconButton} icon={<AddIcon />} />
+          <MenuList>
+            <MenuGroup title={"Create"}>
+              <MenuItem onClick={async () => {await router.push("/admin/create/post")}}>Post</MenuItem>
+              <MenuItem onClick={async () => {await router.push("/admin/create/series")}}>Series</MenuItem>
+              <MenuItem onClick={async () => {await router.push("/admin/create/tag")}}>Tag</MenuItem>
+            </MenuGroup>
+          </MenuList>
+        </Menu>
+        <Menu>
+          <MenuButton as={IconButton} icon={<ViewIcon />} />
+          <MenuList>
+            <MenuGroup title={"View"}>
+              <MenuItem onClick={async () => {changeTypeAs("post")}}>Post</MenuItem>
+              <MenuItem onClick={async () => {changeTypeAs("series")}}>Series</MenuItem>
+              <MenuItem onClick={async () => {changeTypeAs("tag")}}>Tag</MenuItem>
+            </MenuGroup>
+          </MenuList>
+        </Menu>
+      </Flex>
+    </Flex>
     <Flex
       flexDirection={"column"}
       justifyContent="flex-start"
