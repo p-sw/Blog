@@ -34,6 +34,8 @@ export default function Index() {
 
   useEffect(() => {
     if (!searchTriggered) return;
+    setPosts(undefined);
+    setSeries(undefined);
     if (type === "post") {
       fetch(`/api/post?p=${page}&${searchQuery ? "qn="+searchQuery+"&" : ""}${searchTags.map(tag => "qt="+tag).join("&")}`, {
         method: "GET",
@@ -73,7 +75,7 @@ export default function Index() {
         } else {
           toast({
             title: "Error",
-            description: "An error occurred while fetching posts.",
+            description: "An error occurred while fetching series.",
             status: "error",
             duration: 5000,
             isClosable: false,
@@ -85,7 +87,7 @@ export default function Index() {
           setSeries(null);
           return;
         }
-        setSeries(data["posts"]);
+        setSeries(data["series"]);
         setMaxPage(data["maxPage"]);
       })
     }
@@ -163,7 +165,7 @@ export default function Index() {
             if (series.length === 0) {
               return <Text>No series found.</Text>
             }
-            return series.map(series_obj => <SeriesItem key={series.id} series={series_obj} />)
+            return series.map(series_obj => <SeriesItem key={series_obj.id} series={series_obj} />)
           }
         }()
       }

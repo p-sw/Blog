@@ -254,7 +254,7 @@ function DefaultItemObject({type, obj}) {
     <Flex direction={"column"} w={"100%"}>
       <CardBody>
         <Heading fontSize={"3xl"} fontWeight={"bold"}>
-          <LinkOverlay href={`/${type}/${obj.id}`}>{obj.title}</LinkOverlay>
+          <LinkOverlay href={`/${type}/${obj.id}`}>{obj.title !== undefined ? obj.title : obj.name}</LinkOverlay>
         </Heading>
         <Text>{obj.description}</Text>
       </CardBody>
