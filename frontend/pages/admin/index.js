@@ -11,7 +11,8 @@ import {
   Text,
   Box,
   useToast,
-  useDisclosure
+  useDisclosure,
+  Collapse
 } from "@chakra-ui/react";
 import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
@@ -214,21 +215,19 @@ export default function Admin({token}) {
       rowGap={"10px"}
       bgColor={"secondbg"}
     >
-      {
-        isSearchBarOpen
-          ? <Box w={"100%"}>
-              <SearchBar
-                searchTags={searchTags}
-                setSearchTags={setSearchTags}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                tagIdDict={tagIdDict}
-                setTagIdDict={setTagIdDict}
-                searchHandler={() => {setSearchTrigger(true)}}
-              />
-            </Box>
-          : null
-      }
+      <Collapse in={isSearchBarOpen}>
+        <Box w={"100%"}>
+          <SearchBar
+            searchTags={searchTags}
+            setSearchTags={setSearchTags}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            tagIdDict={tagIdDict}
+            setTagIdDict={setTagIdDict}
+            searchHandler={() => {setSearchTrigger(true)}}
+          />
+        </Box>
+      </Collapse>
       <Flex
         direction={"row"}
         justifyContent={"space-between"}
