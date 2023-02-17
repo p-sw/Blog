@@ -216,13 +216,13 @@ function TagItem({id}) {
   return <Tag size={"sm"}>{tagName}</Tag>
 }
 
-export function PostItem({post, inseries=false}) {
+function DefaultItemObject({type, obj}) {
   let toast = useToast();
-  
+
   let [tagIds, setTagIds] = useState([]);
-  
+
   useEffect(() => {
-    fetch(`/api/post/${post.id}/get-tags`, {
+    fetch(`/api/${type}/${obj.id}/get-tags`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -233,30 +233,30 @@ export function PostItem({post, inseries=false}) {
       } else {
         toast({
           title: "Error",
-          description: `An error occured while fetching tags of post ${post.id}`,
+          description: `An error occured while fetching tags of ${type} ${obj.id}`,
           status: "error",
           duration: 5000,
           isClosable: true,
-        });
+        })
         return [];
       }
     }).then(data => setTagIds(data))
   }, [])
-  
+
   return <LinkBox as={Card} direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
     <Box w={"30%"} h={"auto"}>
       {
-        post.thumbnail !== null && post.thumbnail !== ""
-          ? <Image src={"https://cdn.sserve.work/"+post.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+        obj.thumbnail !== undefined && obj.thumbnail !== null && obj.thumbnail !== ""
+          ? <Image src={"https://cdn.sserve.work/"+obj.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
           : <Skeleton h={"100%"} w={"100%"} />
       }
     </Box>
     <Flex direction={"column"} w={"100%"}>
       <CardBody>
         <Heading fontSize={"3xl"} fontWeight={"bold"}>
-          <LinkOverlay href={`/post/${post.id}`}>{post.title}</LinkOverlay>
+          <LinkOverlay href={`/${type}/${obj.id}`}>{obj.title}</LinkOverlay>
         </Heading>
-        <Text>{post.description}</Text>
+        <Text>{obj.description}</Text>
       </CardBody>
       <CardFooter gap={"10px"}>
         {
@@ -265,4 +265,12 @@ export function PostItem({post, inseries=false}) {
       </CardFooter>
     </Flex>
   </LinkBox>
+}
+
+export function PostItem({post}) {
+  return <DefaultItemObject type={"post"} obj={post} />
+}
+
+export function SeriesItem({series}) {
+  return <DefaultItemObject type={"series"} obj={series} />
 }

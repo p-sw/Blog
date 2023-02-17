@@ -3,13 +3,14 @@ import {
   useDisclosure,
   Collapse, Box, useToast,
   Text,
-  Spinner
+  Spinner, Menu, MenuButton, IconButton, MenuList, MenuItem
 } from "@chakra-ui/react";
 import DefaultLayout from "@/layouts/default";
 import SearchBar from "@/components/searchbar";
 import {useEffect, useState} from "react";
+import {ViewIcon} from "@chakra-ui/icons";
 
-import {PostItem} from "@/components/items";
+import {PostItem, SeriesItem} from "@/components/items";
 
 
 export default function Index() {
@@ -95,6 +96,15 @@ export default function Index() {
     searchBarEnabled={true}
     onSearchBarOpen={onSearchBarOpen}
     onSearchBarClose={onSearchBarClose}
+    extraButtons={
+      <Menu>
+        <MenuButton as={IconButton} icon={<ViewIcon />} />
+        <MenuList>
+          <MenuItem onClick={() => {setType("post");setSearchTrigger(true);}}>Post</MenuItem>
+          <MenuItem onClick={() => {setType("series");setSearchTrigger(true);}}>Series</MenuItem>
+        </MenuList>
+      </Menu>
+    }
   >
     <Flex
       direction={"column"}
@@ -103,14 +113,13 @@ export default function Index() {
       position={"sticky"}
       top={"navheight"}
       w={"100%"}
-      p={"10px"}
       zIndex={"50"}
       boxSizing={"border-box"}
       rowGap={"10px"}
       bgColor={"secondbg"}
     >
       <Collapse in={isSearchBarOpen}>
-        <Box w={"100%"}>
+        <Box w={"100%"} pb={"10px"}>
           <SearchBar
             searchTags={searchTags}
             setSearchTags={setSearchTags}
@@ -144,6 +153,17 @@ export default function Index() {
               return <Text>No posts found.</Text>
             }
             return posts.map(post => <PostItem key={post.id} post={post} />)
+          } else if (type === "series") {
+            if (series === undefined) {
+              return <Spinner />
+            }
+            if (series === null) {
+              return <Text>There was unexpected error while fetching series.<br />Please reload the page.</Text>
+            }
+            if (series.length === 0) {
+              return <Text>No series found.</Text>
+            }
+            return series.map(series_obj => <SeriesItem key={series.id} series={series_obj} />)
           }
         }()
       }

@@ -12,7 +12,13 @@ import {
     Search2Icon, CloseIcon
 } from "@chakra-ui/icons";
 
-export default function Navigation({ searchBarEnabled=false, onSearchBarOpen=()=>{}, onSearchBarClose=()=>{} }) {
+export default function Navigation(
+  {
+      searchBarEnabled=false,
+      onSearchBarOpen=()=>{},
+      onSearchBarClose=()=>{},
+      extraButtons=null
+  }) {
     let {colorMode, toggleColorMode} = useColorMode();
     let {isOpen, onOpen, onClose} = useDisclosure();
 
@@ -59,6 +65,7 @@ export default function Navigation({ searchBarEnabled=false, onSearchBarOpen=()=
                     }} />
                   : null
             }
+            {extraButtons}
         </Flex>
     </Flex>
 }
