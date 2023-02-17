@@ -7,7 +7,7 @@ import {
   Box,
   Divider,
   Flex,
-  Heading,
+  Heading, Image,
   Spinner,
   Text,
   Tooltip,
@@ -182,8 +182,17 @@ export default function PostView() {
                     </AccordionPanel>
                   </AccordionItem>
                 </Accordion>
-                <Divider mt={"30px"} mb={"30px"} />
-                <Text fontSize={"xl"} fontWeight={"bold"} mb={"20px"} w={"100%"}>{post.description}</Text>
+                <Divider m={"30px 0"} />
+                {
+                  post.thumbnail !== undefined && post.thumbnail !== null
+                    ? <Image
+                      src={`https://cdn.sserve.work/${post.thumbnail}`}
+                      aria-label={"Post Thumbnail"}
+                      h={"100%"} maxH={"200px"} m={"40px 0"} />
+                    : <></>
+                }
+                <Text fontSize={"lg"} fontWeight={"semibold"} mb={"20px"} w={"100%"}>{post.description}</Text>
+                <Divider m={"30px 0"} />
                 <Box
                   dangerouslySetInnerHTML={{__html: showdown.makeHtml(post.content)}}
                   id={"content"}
