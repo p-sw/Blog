@@ -96,7 +96,7 @@ export default function PostView() {
     >
       <Flex
         direction={"column"}
-        align={"flex-start"}
+        align={"center"}
         justify={"flex-start"}
         w={"90%"}
         maxW={"800px"}
@@ -136,7 +136,7 @@ export default function PostView() {
             : post === null
               ? <Text>Post not found.</Text>
               : <>
-                <Heading as={"h1"} fontSize={"4xl"} fontWeight={"black"} mb={"30px"}>{post.title}</Heading>
+                <Heading as={"h1"} fontSize={"4xl"} fontWeight={"black"} mb={"30px"} w={"100%"}>{post.title}</Heading>
                 <Accordion allowToggle w={"100%"}>
                   <AccordionItem>
                     <AccordionButton>
@@ -153,7 +153,7 @@ export default function PostView() {
                   </AccordionItem>
                 </Accordion>
                 <Divider mt={"30px"} mb={"30px"} />
-                <Text fontSize={"xl"} fontWeight={"bold"} mb={"20px"}>{post.description}</Text>
+                <Text fontSize={"xl"} fontWeight={"bold"} mb={"20px"} w={"100%"}>{post.description}</Text>
                 <Box
                   dangerouslySetInnerHTML={{__html: showdown.makeHtml(post.content)}}
                   id={"content"}
