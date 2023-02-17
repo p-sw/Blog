@@ -244,10 +244,10 @@ function DefaultItemObject({type, obj}) {
   }, [])
 
   return <LinkBox as={Card} direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
-    <Box w={"30%"} h={"auto"}>
+    <Box w={"30%"} h={"auto"} borderLeftRadius={"base"}>
       {
         obj.thumbnail !== undefined && obj.thumbnail !== null && obj.thumbnail !== ""
-          ? <Image src={"https://cdn.sserve.work/"+obj.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+          ? <Image src={"https://cdn.sserve.work/"+obj.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} borderLeftRadius={"base"} />
           : <Skeleton h={"100%"} w={"100%"} />
       }
     </Box>
