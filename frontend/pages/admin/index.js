@@ -312,6 +312,7 @@ export default function Admin({token}) {
                 key={i}
                 onClick={async () => {
                   setPage(i);
+                  setSearchTrigger(true);
                 }}
                 bgColor={i === page ? "blue.500" : "transparent"}
                 size={"sm"}
