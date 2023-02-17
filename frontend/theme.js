@@ -30,8 +30,8 @@ const theme = extendTheme({
                 _dark: "#222",
             },
             mainbg: {
-                default: "orange.100",
-                _light: "orange.100",
+                default: "white",
+                _light: "white",
                 _dark: "#151515",
             },
             secondbg: {
@@ -57,7 +57,7 @@ const theme = extendTheme({
         },
         shadows: {
             undernav: {
-                default: "0 5px 5px rgba(255, 255, 255, .6)",
+                default: "0 5px 4px 2px rgba(0, 0, 0, .1)",
                 _dark: "none"
             },
         },
