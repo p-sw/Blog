@@ -285,7 +285,7 @@ async def get_series(page: int = Query(1), query_name: str = Query(None, alias="
     if query_name is not None:
         queryset = queryset.filter(name__icontains=query_name)
     if query_tags is not None:
-        queryset = queryset.filter(tags__id__in=query_tags).annotate(count=Count("tags")).filter(count=len(query_tags))
+        queryset = queryset.filter(tags__id__in=query_tags).annotate(tag_count=Count('tags')).filter(tag_count__gte=len(query_tags))
     items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
     max_page = (await queryset.count()) // 10 + 1
     return SeriesSearchResult(
@@ -358,6 +358,23 @@ General Section
 """
 general = APIRouter()
 
+@general.get("/post", response_model=PostSearchResult)
+async def get_posts(
+        page: int = Query(1, alias="p", title="page"),
+        query_title: str = Query(None, alias="qn", title="query title"),
+        query_tags: list[int] = Query(None, alias="qt", title="query tags")):
+    queryset = Post.filter(series=None, hidden=False).distinct()
+    if query_title is not None:
+        queryset = queryset.filter(title__icontains=query_title)
+    if query_tags is not None:
+        queryset = queryset.filter(tags__id__in=query_tags).annotate(tag_count=Count('tags')).filter(tag_count__gte=len(query_tags))
+    items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
+    max_page = await queryset.count() // 10 + 1
+    return PostSearchResult(
+        posts=items,
+        max_page=max_page,
+    )
+
 @general.get("/post/{post_id}", response_model=SinglePostResponse)
 async def get_single_post(post_id: int):
     post = await Post.get_or_none(id=post_id)
@@ -380,6 +397,20 @@ async def get_post_series(post_id: int):
     if post.series is None:
         return SeriesIdResponse(id=None)
     return SeriesIdResponse(id=post.series.id)
+
+@admin.get("/series", response_model=SeriesSearchResult)
+async def get_series(page: int = Query(1), query_name: str = Query(None, alias="qn", title="query name"), query_tags: list[int] = Query(None, alias="qt", title="query tags")):
+    queryset = Series.filter(hidden=False).distinct()
+    if query_name is not None:
+        queryset = queryset.filter(name__icontains=query_name)
+    if query_tags is not None:
+        queryset = queryset.filter(tags__id__in=query_tags).annotate(tag_count=Count('tags')).filter(tag_count__gte=len(query_tags))
+    items = await queryset.order_by("-id").limit(10).offset((page - 1) * 10)
+    max_page = (await queryset.count()) // 10 + 1
+    return SeriesSearchResult(
+        series=items,
+        max_page=max_page,
+    )
 
 @general.get("/series/{series_id}", response_model=SingleSeriesResponse)
 async def get_single_series(series_id: int):
