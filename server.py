@@ -398,7 +398,7 @@ async def get_post_series(post_id: int):
         return SeriesIdResponse(id=None)
     return SeriesIdResponse(id=post.series.id)
 
-@admin.get("/series", response_model=SeriesSearchResult)
+@general.get("/series", response_model=SeriesSearchResult)
 async def get_series(page: int = Query(1), query_name: str = Query(None, alias="qn", title="query name"), query_tags: list[int] = Query(None, alias="qt", title="query tags")):
     queryset = Series.filter(hidden=False).distinct()
     if query_name is not None:
