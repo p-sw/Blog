@@ -53,7 +53,7 @@ export default function PostView() {
   let [dates, setDates] = useState({});
 
   useEffect(() => {
-    hljs.initHighlighting();
+    hljs.highlightAll();
   }, [])
 
   useEffect(() => {
@@ -184,7 +184,7 @@ export default function PostView() {
                 </Accordion>
                 <Divider m={"30px 0"} />
                 {
-                  post.thumbnail !== undefined && post.thumbnail !== null
+                  post.thumbnail !== undefined && post.thumbnail !== null && post.thumbnail !== ""
                     ? <Image
                       src={`https://cdn.sserve.work/${post.thumbnail}`}
                       aria-label={"Post Thumbnail"}
