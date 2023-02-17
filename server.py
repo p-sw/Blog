@@ -423,7 +423,7 @@ async def get_single_series(series_id: int):
 async def get_series_posts(series_id: int):
     series = await Series.get_or_none(id=series_id)
     await series.fetch_related("posts")
-    return [post.id for post in series.posts]
+    return [post.id for post in series.posts if not post.hidden]
 
 @general.get("/series/{series_id}/get-tags", response_model=List[int])
 async def get_series_tags(series_id: int):
