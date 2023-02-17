@@ -105,6 +105,8 @@ export default function PostView() {
         <style jsx global>{`
           #content img {
             margin: 50px auto;
+            max-width: 400px;
+            max-height: 400px;
           }
           #content p{font-size:1rem;line-height:var(--chakra-lineHeights-tall);}
           #content h1,#content h2,#content h3,#content h4,#content h5,#content h6{ 
