@@ -17,10 +17,31 @@ import DefaultLayout from "@/layouts/default";
 import {useEffect, useState} from "react";
 import Showdown from "showdown";
 import {EditIcon, SmallAddIcon, ViewIcon} from "@chakra-ui/icons";
+import hljs from "highlight.js";
+import python from "highlight.js/lib/languages/python";
+import javascript from "highlight.js/lib/languages/javascript";
+import typescript from "highlight.js/lib/languages/typescript";
+import html from "highlight.js/lib/languages/xml";
+import css from "highlight.js/lib/languages/css";
+import jsx from "highlight.js/lib/languages/javascript";
+import tsx from "highlight.js/lib/languages/typescript";
+import Head from "next/head";
 
 let showdown = new Showdown.Converter({
   strikethrough: true,
 });
+
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("py", python);
+hljs.registerLanguage("js", javascript);
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("ts", typescript);
+hljs.registerLanguage("typescript", typescript);
+hljs.registerLanguage("html", html);
+hljs.registerLanguage("css", css);
+hljs.registerLanguage("jsx", jsx);
+hljs.registerLanguage("tsx", tsx);
+
 
 export default function PostView() {
   let router = useRouter();
@@ -30,6 +51,10 @@ export default function PostView() {
 
   let [post, setPost] = useState(undefined);
   let [dates, setDates] = useState({});
+
+  useEffect(() => {
+    hljs.initHighlighting();
+  }, [])
 
   useEffect(() => {
     if (post_id === undefined) return;
@@ -85,6 +110,10 @@ export default function PostView() {
 
 
   return <DefaultLayout>
+    <Head>
+      <link rel="stylesheet"
+      href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css" />
+    </Head>
     <Flex
       direction={"column"}
       align={"center"}
@@ -129,6 +158,7 @@ export default function PostView() {
           #content ul {list-style-type:disc;}
           #content ol {list-style-type:decimal;}
           #content li {margin:5px 0;}
+          #content pre {margin: 30px 0;font-size:var(--chakra-fontSizes-sm);}
         `}</style>
         {
           post === undefined
@@ -157,6 +187,7 @@ export default function PostView() {
                 <Box
                   dangerouslySetInnerHTML={{__html: showdown.makeHtml(post.content)}}
                   id={"content"}
+                  w={"100%"}
                 />
               </>
         }
