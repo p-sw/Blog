@@ -11,11 +11,16 @@ import {
   MenuList,
   Skeleton,
   Text,
-  IconButton, Image, Box
+  IconButton, Image, Box,
+  LinkOverlay,
+  LinkBox,
+  Tag,
+  useToast
 } from "@chakra-ui/react";
 import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
 import {AiFillDelete, AiFillEdit} from "react-icons/ai";
 import {FaExternalLinkAlt} from "react-icons/fa";
+import {useEffect, useState} from "react";
 
 export function AdminPostItem({post, inseries=false, onDeleteInSeries, token, refresh}) {
   let router = useRouter();
@@ -179,4 +184,85 @@ export function AdminTagItem({tag, inseries=false, onDeleteInSeries, token, refr
       </CardFooter>
     </Flex>
   </Card>
+}
+
+function TagItem({id}) {
+  let [tagName, setTagName] = useState("");
+
+  let toast = useToast();
+
+  useEffect(() => {
+    fetch(`/api/tag/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.status === 200) {
+        return res.json();
+      } else {
+        toast({
+          title: "Error",
+          description: `An error occured while fetching tag ${id}`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return {name: ""};
+      }
+    }).then(data => setTagName(data.name))
+  }, [])
+
+  return <Tag size={"sm"}>{tagName}</Tag>
+}
+
+export function PostItem({post, inseries=false}) {
+  let toast = useToast();
+  
+  let [tagIds, setTagIds] = useState([]);
+  
+  useEffect(() => {
+    fetch(`/api/post/${post.id}/get-tags`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.status === 200) {
+        return res.json();
+      } else {
+        toast({
+          title: "Error",
+          description: `An error occured while fetching tags of post ${post.id}`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return [];
+      }
+    }).then(data => setTagIds(data))
+  }, [])
+  
+  return <LinkBox as={Card} direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
+    <Box w={"30%"} h={"auto"}>
+      {
+        post.thumbnail !== null && post.thumbnail !== ""
+          ? <Image src={"https://cdn.sserve.work/"+post.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+          : <Skeleton h={"100%"} w={"100%"} />
+      }
+    </Box>
+    <Flex direction={"column"} w={"100%"}>
+      <CardBody>
+        <Heading fontSize={"3xl"} fontWeight={"bold"}>
+          <LinkOverlay href={`/post/${post.id}`}>{post.title}</LinkOverlay>
+        </Heading>
+        <Text>{post.description}</Text>
+      </CardBody>
+      <CardFooter gap={"10px"}>
+        {
+          tagIds.map((id, index) => <TagItem key={index} id={id} />)
+        }
+      </CardFooter>
+    </Flex>
+  </LinkBox>
 }
