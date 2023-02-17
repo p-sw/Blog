@@ -7,9 +7,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       }
     })
-    let j = await post.json()
-    console.log(j)
-    res.status(post.status).json(j);
+    res.status(post.status).json(await post.json());
   } else {
     res.status(405).json({message: "Method not allowed"});
   }
