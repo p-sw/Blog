@@ -1,4 +1,4 @@
-# AdminPage Todo List
+# Todo List
 
 - ~~메인 검색 기능~~
 - ~~메인 페이지 넘기기 기능~~
@@ -10,4 +10,5 @@
 - ~~시리즈에서 포스트 리스트로 만들고 수정 삭제 가능하게~~
 - ~~에디터에서 PID 있으면 update api 호출~~
 - ~~Delete 구현~~
-- 401 redirection과 기타 에러 Toast로 처리
+- ~~401 redirection과 기타 에러 Toast로 처리~~
+- SEO 구현
