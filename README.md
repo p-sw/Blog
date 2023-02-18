@@ -12,5 +12,5 @@
 - [X] Delete 구현
 - [X] 401 redirection과 기타 에러 Toast로 처리
 - [ ] SEO 구현
-- [ ] 다크 모드 코드 하이라이팅 스타일 처리
-- [ ] 하이라이팅시 unescaped HTML 고치기
+- [X] 다크 모드 코드 하이라이팅 스타일 처리
+- [X] 하이라이팅시 unescaped HTML 고치기

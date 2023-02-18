@@ -10,37 +10,18 @@ import {
   Heading, Image,
   Spinner,
   Text,
-  Tooltip,
+  Tooltip, useColorMode,
   useToast
 } from "@chakra-ui/react";
 import DefaultLayout from "@/layouts/default";
 import {useEffect, useState} from "react";
-import Showdown from "showdown";
 import {EditIcon, SmallAddIcon, ViewIcon} from "@chakra-ui/icons";
-import hljs from "highlight.js";
-import python from "highlight.js/lib/languages/python";
-import javascript from "highlight.js/lib/languages/javascript";
-import typescript from "highlight.js/lib/languages/typescript";
-import html from "highlight.js/lib/languages/xml";
-import css from "highlight.js/lib/languages/css";
-import jsx from "highlight.js/lib/languages/javascript";
-import tsx from "highlight.js/lib/languages/typescript";
-import Head from "next/head";
-
-let showdown = new Showdown.Converter({
-  strikethrough: true,
-});
-
-hljs.registerLanguage("python", python);
-hljs.registerLanguage("py", python);
-hljs.registerLanguage("js", javascript);
-hljs.registerLanguage("javascript", javascript);
-hljs.registerLanguage("ts", typescript);
-hljs.registerLanguage("typescript", typescript);
-hljs.registerLanguage("html", html);
-hljs.registerLanguage("css", css);
-hljs.registerLanguage("jsx", jsx);
-hljs.registerLanguage("tsx", tsx);
+import ReactMarkdown from 'react-markdown';
+import RemarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
+import {materialDark, materialLight} from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 
 export default function PostView() {
@@ -51,10 +32,6 @@ export default function PostView() {
 
   let [post, setPost] = useState(undefined);
   let [dates, setDates] = useState({});
-
-  useEffect(() => {
-    hljs.highlightAll();
-  }, [])
 
   useEffect(() => {
     if (post_id === undefined) return;
@@ -108,12 +85,27 @@ export default function PostView() {
     </Heading>
   }
 
+  function Code({node, inline, className, children, ...props}) {
+    let {colorMode} = useColorMode();
+    const match = /language-(\w+)/.exec(className || '')
+    return <Box p={"10px"} id={colorMode}>{
+      !inline && match ? (
+        <SyntaxHighlighter
+          style={colorMode === "light" ? materialLight : materialDark}
+          language={match[1]}
+          PreTag="div"
+          {...props}
+        >{String(children).replace(/\n$/, '')}</SyntaxHighlighter>
+      ) : (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      )
+    }</Box>
+  }
+
 
   return <DefaultLayout>
-    <Head>
-      <link rel="stylesheet"
-      href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css" />
-    </Head>
     <Flex
       direction={"column"}
       align={"center"}
@@ -137,28 +129,120 @@ export default function PostView() {
             max-width: 400px;
             max-height: 400px;
           }
-          #content p{font-size:1rem;line-height:var(--chakra-lineHeights-tall);}
-          #content h1,#content h2,#content h3,#content h4,#content h5,#content h6{ 
-            font-weight:600; 
-            border-bottom:1px solid var(--chakra-colors-chakra-body-text);
-            margin-bottom:15px;
-            padding-bottom:15px;
-            margin-top:30px;
+
+          #content p {
+            font-size: 1rem;
+            line-height: var(--chakra-lineHeights-tall);
           }
-          #content h1{font-size:var(--chakra-fontSizes-4xl);}
-          #content h2 {font-size:var(--chakra-fontSizes-3xl);}
-          #content h3 {font-size:var(--chakra-fontSizes-2xl);}
-          #content h4 {font-size:var(--chakra-fontSizes-xl);}
-          #content h5 {font-size:var(--chakra-fontSizes-lg);}
-          #content h6 {font-size:var(--chakra-fontSizes-md);}
-          #content em {font-style:italic;}
-          #content strong {font-weight:var(--chakra-fontWeights-black);}
-          #content del {text-decoration:line-through;}
-          #content ul,#content ol {list-style-position:inside;margin:20px 0 20px 20px;}
-          #content ul {list-style-type:disc;}
-          #content ol {list-style-type:decimal;}
-          #content li {margin:5px 0;}
-          #content pre {margin: 30px 0;font-size:var(--chakra-fontSizes-sm);}
+
+          #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+            font-weight: 600;
+            border-bottom: 1px solid var(--chakra-colors-chakra-body-text);
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            margin-top: 30px;
+          }
+
+          #content h1 {
+            font-size: var(--chakra-fontSizes-4xl);
+          }
+
+          #content h2 {
+            font-size: var(--chakra-fontSizes-3xl);
+          }
+
+          #content h3 {
+            font-size: var(--chakra-fontSizes-2xl);
+          }
+
+          #content h4 {
+            font-size: var(--chakra-fontSizes-xl);
+          }
+
+          #content h5 {
+            font-size: var(--chakra-fontSizes-lg);
+          }
+
+          #content h6 {
+            font-size: var(--chakra-fontSizes-md);
+          }
+
+          #content em {
+            font-style: italic;
+          }
+
+          #content strong {
+            font-weight: var(--chakra-fontWeights-black);
+          }
+
+          #content del {
+            text-decoration: line-through;
+          }
+
+          #content ul, #content ol {
+            list-style-position: inside;
+            margin: 20px 0 20px 20px;
+          }
+
+          #content ul {
+            list-style-type: disc;
+          }
+
+          #content ol {
+            list-style-type: decimal;
+          }
+
+          #content li {
+            margin: 5px 0;
+          }
+
+          #content pre {
+            margin: 30px 0;
+            font-size: var(--chakra-fontSizes-sm);
+          }
+
+          #content div:has(> code) {
+            font-size: var(--chakra-fontSizes-sm);
+            border-radius: 15px;
+          }
+
+          #content div:has(> code)::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+            margin-bottom: 10px;
+          }
+
+          #content div#dark div:has(> code)::-webkit-scrollbar-track {
+            background: #c0a1f1;
+            border-radius: 10px;
+          }
+
+          #content div#dark div:has(> code)::-webkit-scrollbar-thumb {
+            background: #a16cf1;
+            border-radius: 10px;
+            transition: background 0.2s;
+          }
+
+          #content div#dark div:has(> code)::-webkit-scrollbar-thumb:hover {
+            background: #7f3cf1;
+            transition: background 0.2s;
+          }
+
+          #content div#light div:has(> code)::-webkit-scrollbar-track {
+            background: #ffce92;
+            border-radius: 10px;
+          }
+
+          #content div#light div:has(> code)::-webkit-scrollbar-thumb {
+            background: #ff8f1b;
+            border-radius: 10px;
+            transition: background 0.2s;
+          }
+
+          #content div#light div:has(> code)::-webkit-scrollbar-thumb:hover {
+            background: #ff6f1b;
+            transition: background 0.2s;
+          }
         `}</style>
         {
           post === undefined
@@ -193,11 +277,17 @@ export default function PostView() {
                 }
                 <Text fontSize={"lg"} fontWeight={"semibold"} mb={"20px"} w={"100%"}>{post.description}</Text>
                 <Divider m={"30px 0"} />
-                <Box
-                  dangerouslySetInnerHTML={{__html: showdown.makeHtml(post.content)}}
-                  id={"content"}
-                  w={"100%"}
-                />
+                <Box id={"content"} w={"100%"}>
+                  <ReactMarkdown
+                    remarkPlugins={[[RemarkGfm, {singleTilde: false}], [remarkMath]]}
+                    rehypePlugins={[rehypeKatex]}
+                    components={{
+                      code: Code
+                    }}
+                  >
+                    {post.content}
+                  </ReactMarkdown>
+                </Box>
               </>
         }
       </Flex>
