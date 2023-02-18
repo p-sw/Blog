@@ -1,5 +1,8 @@
 FROM node:18.13.0-alpine
 
+ARG API_KEY
+ENV API_KEY=$API_KEY
+
 WORKDIR /app
 
 COPY package.json package-lock.json /app/
