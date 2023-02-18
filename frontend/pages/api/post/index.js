@@ -1,3 +1,5 @@
+import loc from "@/globals";
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     let posts = await getPosts(req.headers.hasOwnProperty("token") ? req.headers.token : "", req.query);
@@ -38,7 +40,7 @@ async function getPosts(token="", {p: page, qn: query_name, qt: query_tags}) {
   query = query + `${query_name!==undefined?"qn="+query_name+"&":""}`;
   query = query + `${query_tags!==undefined?typeof query_tags==="string"?"qt="+query_tags:query_tags.map(tag=>"qt="+tag).join("&"):""}`;
 
-  return await fetch("http://127.0.0.1:8000" + endpoint + query, {
+  return await fetch(loc.backend(endpoint + query), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -48,7 +50,7 @@ async function getPosts(token="", {p: page, qn: query_name, qt: query_tags}) {
 }
 
 async function createPost({title, description, content, thumbnail=null, tag_ids=null, series_id=null, hidden=false}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/post", {
+  return await fetch(loc.backend("/admin/post"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -67,7 +69,7 @@ async function createPost({title, description, content, thumbnail=null, tag_ids=
 }
 
 async function updatePost({id, title=null, description=null, content=null, thumbnail=null, tags=null, series_id=null, hidden=null}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/post", {
+  return await fetch(loc.backend("/admin/post"), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -87,7 +89,7 @@ async function updatePost({id, title=null, description=null, content=null, thumb
 }
 
 async function deletePost({id}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/post", {
+  return await fetch(loc.backend("/admin/post"), {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

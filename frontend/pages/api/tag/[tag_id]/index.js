@@ -1,7 +1,9 @@
+import loc from "@/globals";
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     let {tag_id} = req.query;
-    let post = await fetch("http://127.0.0.1:8000/api/tag/" + tag_id, {
+    let post = await fetch(loc.backend("/api/tag/" + tag_id), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

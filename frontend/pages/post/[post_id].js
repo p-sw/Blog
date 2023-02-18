@@ -23,11 +23,12 @@ import rehypeKatex from 'rehype-katex';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
 import {materialDark, materialLight} from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import {NextSeo} from "next-seo";
+import loc from "@/globals";
 
 
 export async function getServerSideProps(context) {
   // for seo
-  let req = fetch(`http://127.0.0.1:8000/api/post/${context.params["post_id"]}`, {
+  let req = fetch(loc.backend(`/api/post/${context.params["post_id"]}`), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -147,7 +148,7 @@ export default function PostView({notFound = false, svspost = null}) {
         description: !notFound ? svspost.description : "Post Not Found",
         images: !notFound && svspost.thumbnail !== undefined && svspost.thumbnail !== null && svspost.thumbnail !== "" ? [
           {
-            url: `https://cdn.sserve.work/${svspost.thumbnail}`,
+            url: loc.cdn(svspost.thumbnail),
             width: 800,
             height: 600,
             alt: svspost.title,
@@ -319,7 +320,7 @@ export default function PostView({notFound = false, svspost = null}) {
                 {
                   post.thumbnail !== undefined && post.thumbnail !== null && post.thumbnail !== ""
                     ? <Image
-                      src={`https://cdn.sserve.work/${post.thumbnail}`}
+                      src={loc.cdn(${post.thumbnail})}
                       aria-label={"Post Thumbnail"}
                       h={"100%"} maxH={"200px"} m={"40px 0"} />
                     : <></>

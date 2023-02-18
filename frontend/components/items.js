@@ -21,6 +21,7 @@ import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
 import {AiFillDelete, AiFillEdit} from "react-icons/ai";
 import {FaExternalLinkAlt} from "react-icons/fa";
 import {useEffect, useState} from "react";
+import loc from "@/globals";
 
 export function AdminPostItem({post, inseries=false, onDeleteInSeries, token, refresh}) {
   let router = useRouter();
@@ -51,7 +52,7 @@ export function AdminPostItem({post, inseries=false, onDeleteInSeries, token, re
     <Box w={"30%"} h={"auto"}>
       {
         post.thumbnail !== null && post.thumbnail !== ""
-          ? <Image src={"https://cdn.sserve.work/"+post.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+          ? <Image src={loc.cdn(post.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
           : <Skeleton h={"100%"} w={"100%"} />
       }
     </Box>
@@ -108,7 +109,7 @@ export function AdminSeriesItem({series, token, refresh}) {
     <Box w={"30%"} h={"auto"}>
       {
         series.thumbnail !== null && series.thumbnail !== ""
-          ? <Image src={"https://cdn.sserve.work/"+series.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
+          ? <Image src={loc.cdn(series.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
           : <Skeleton h={"100%"} w={"100%"} />
       }
     </Box>
@@ -247,7 +248,7 @@ function DefaultItemObject({type, obj}) {
     <Box w={"30%"} h={"auto"} borderLeftRadius={"base"}>
       {
         obj.thumbnail !== undefined && obj.thumbnail !== null && obj.thumbnail !== ""
-          ? <Image src={"https://cdn.sserve.work/"+obj.thumbnail} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} borderLeftRadius={"base"} />
+          ? <Image src={loc.cdn(obj.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} borderLeftRadius={"base"} />
           : <Skeleton h={"100%"} w={"100%"} />
       }
     </Box>

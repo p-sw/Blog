@@ -1,9 +1,11 @@
+import loc from "@/globals";
+
 export async function hasToken(cookies) {
   return cookies.hasOwnProperty("token")
 }
 
 export async function tokenValidate(token) {
-  let res = await fetch("http://127.0.0.1:8000/validate", {
+  let res = await fetch(loc.backend("/validate"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

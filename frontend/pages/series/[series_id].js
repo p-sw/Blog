@@ -4,9 +4,10 @@ import {Flex, Spinner, useToast, Text} from "@chakra-ui/react";
 import {useEffect, useState} from "react";
 import {PostItem} from "@/components/items";
 import {NextSeo} from "next-seo";
+import loc from "@/globals";
 
 export async function getServerSideProps(context) {
-  let req = fetch(`http://127.0.0.1:8000/api/series/${context.params["series_id"]}`, {
+  let req = fetch(loc.backend(`/api/series/${context.params["series_id"]}`), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -114,7 +115,7 @@ export default function SeriesView({notFound=false, svsseries=null}) {
         description: !notFound ? svsseries.description : "Series Not Found",
         images: !notFound && svsseries.thumbnail !== null && svsseries.thumbnail !== undefined && svsseries.thumbnail !== "" ? [
           {
-            url: `https://cdn.sserve.work/${svsseries.thumbnail}`,
+            url: loc.cdn(svsseries.thumbnail),
             width: 800,
             height: 600,
             alt: svsseries.name,

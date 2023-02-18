@@ -1,3 +1,5 @@
+import loc from "@/globals";
+
 export default async function handler(req, res) {
   if (!(req.body.username && req.body.password)) {
     res.status(400).json({
@@ -8,7 +10,7 @@ export default async function handler(req, res) {
   let username = req.body.username
   let password = req.body.password
 
-  let loginRes = await fetch("http://127.0.0.1:8000/login", {
+  let loginRes = await fetch(loc.backend("/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

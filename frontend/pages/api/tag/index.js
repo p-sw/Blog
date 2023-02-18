@@ -1,3 +1,5 @@
+import loc from "@/globals";
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     let series = await getTag(req.headers.hasOwnProperty("token") ? req.headers.token : "", req.query);
@@ -36,7 +38,7 @@ async function getTag(token="", {p: page, qn: query_name}) {
 
   let query = `?p=${page}${query_name !== undefined ? "&qn="+query_name : ""}`;
 
-  return await fetch("http://127.0.0.1:8000" + endpoint + query, {
+  return await fetch(loc.backend(endpoint + query), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -46,7 +48,7 @@ async function getTag(token="", {p: page, qn: query_name}) {
 }
 
 async function createTag({name}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/tag", {
+  return await fetch(loc.backend("/admin/tag"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -59,7 +61,7 @@ async function createTag({name}, token) {
 }
 
 async function updateTag({id, name=null}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/tag", {
+  return await fetch(loc.backend("/admin/tag"), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -73,7 +75,7 @@ async function updateTag({id, name=null}, token) {
 }
 
 async function deleteTag({id}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/tag", {
+  return await fetch(loc.backend("/admin/tag"), {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

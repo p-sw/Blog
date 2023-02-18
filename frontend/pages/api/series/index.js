@@ -1,3 +1,5 @@
+import loc from "@/globals";
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     let series = await getSeries(req.headers.hasOwnProperty("token") ? req.headers.token : "", req.query);
@@ -38,7 +40,7 @@ async function getSeries(token="", {p: page, qn: query_name, qt: query_tags}) {
   query = query + `${query_name!==undefined?"qn="+query_name+"&":""}`;
   query = query + `${query_tags!==undefined?typeof query_tags==="string"?"qt="+query_tags:query_tags.map(tag=>"qt="+tag).join("&"):""}`;
 
-  return await fetch("http://127.0.0.1:8000" + endpoint + query, {
+  return await fetch(loc.backend(endpoint + query), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -48,7 +50,7 @@ async function getSeries(token="", {p: page, qn: query_name, qt: query_tags}) {
 }
 
 async function createSeries({name, description, thumbnail=null, hidden=false, posts=[], tags=[]}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/series", {
+  return await fetch(loc.backend("/admin/series"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,7 +68,7 @@ async function createSeries({name, description, thumbnail=null, hidden=false, po
 }
 
 async function updateSeries({id, name=null, description=null, thumbnail=null, hidden=null, posts=[], tags=[]}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/series", {
+  return await fetch(loc.backend("/admin/series"), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -85,7 +87,7 @@ async function updateSeries({id, name=null, description=null, thumbnail=null, hi
 }
 
 async function deleteSeries({id}, token) {
-  return await fetch("http://127.0.0.1:8000/admin/series", {
+  return await fetch(loc.backend("/admin/series"), {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

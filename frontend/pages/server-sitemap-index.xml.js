@@ -1,14 +1,15 @@
 import { getServerSideSitemapIndex } from "next-sitemap";
+import loc from "@/globals";
 
 export const getServerSideProps = async (ctx) => {
-  let post_ids = await fetch(`http://127.0.0.1:8000/api/post-ids`, {
+  let post_ids = await fetch(loc.backend("/api/post-ids"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     }
   })
 
-  let series_ids = await fetch(`http://127.0.0.1:8000/api/series-ids`, {
+  let series_ids = await fetch(loc.backend("/api/series-ids"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
