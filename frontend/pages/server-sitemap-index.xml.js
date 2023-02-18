@@ -1,4 +1,4 @@
-import { getServerSideSitemapIndex } from "next-sitemap";
+import { getServerSideSitemap } from "next-sitemap";
 import loc from "@/globals";
 
 export const getServerSideProps = async (ctx) => {
@@ -16,7 +16,7 @@ export const getServerSideProps = async (ctx) => {
     }
   })
 
-  return getServerSideSitemapIndex(ctx, [
+  return getServerSideSitemap(ctx, [
     ...(await post_ids.json()).map(id => loc.defaultUrl + `/post/${id}`),
     ...(await series_ids.json()).map(id => loc.defaultUrl + `/series/${id}`)
   ])
