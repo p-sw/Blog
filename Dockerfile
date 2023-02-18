@@ -2,7 +2,8 @@ FROM python:3.11.1-alpine
 
 WORKDIR /app
 
-COPY server.py pydantic_models.py Pipfile Pipfile.lock prodlog.ini db /app/
+COPY server.py pydantic_models.py Pipfile Pipfile.lock prodlog.ini /app/
+COPY ./db /app/db
 
 RUN pip install pipenv && pipenv install --system --deploy
 
