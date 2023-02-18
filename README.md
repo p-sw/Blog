@@ -50,3 +50,6 @@ Docker와 Nginx를 활용하는 것을 권장합니다.
 - [ ] 포스트 에디터 라이브 프리뷰
 - [X] 메인 페이지 네비게이션
 - [ ] 포스트 안에서 시리즈 목록 보기
+- [X] 마크다운 링크 스타일링
+- [ ] View 카운트
+- [X] katex-html aria-hidden=true hidden처리

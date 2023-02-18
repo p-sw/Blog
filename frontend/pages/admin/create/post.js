@@ -421,39 +421,6 @@ export default function PostCreateForm({token}) {
                     }
                   }
                 }}
-                onPaste={(e) => {
-                  e.preventDefault();
-                  const items = e.clipboardData.items;
-                  for (let i = 0; i < items.length; i++) {
-                    if (items[i].kind === "file") {
-                      const file = items[i].getAsFile();
-                      const formData = new FormData();
-                      formData.append("file", file);
-                      fetch("/cdn/upload", {
-                        method: "POST",
-                        body: formData
-                      }).then(res => {
-                        if (res.status === 200) {
-                          return res.json()
-                        } else {
-                          toast({
-                            title: `Error: ${res.status}`,
-                            description: `Failed to upload image: ${res.statusText}`,
-                            status: "error",
-                            duration: 5000,
-                            isClosable: true,
-                          })
-                          return null;
-                        }
-                      }).then(data => {
-                        if (data === null) return;
-                        setBody(prev => {
-                          return {...prev, content: `${prev.content}\n![](https://cdn.sserve.work/${data.hash}.${file.type.split("/")[1]})`}
-                        })
-                      })
-                    }
-                  }
-                }}
               />
               <Input type={"file"} display={"none"} ref={imageUploaderRef} onChange={(e) => {
                 const formData = new FormData();

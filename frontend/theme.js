@@ -44,6 +44,21 @@ const theme = extendTheme({
                 _light: "black",
                 _dark: "white"
             },
+            "scrollbar-track": {
+                default: "#ffce92",
+                _light: "#ffce92",
+                _dark: "#c0a1f1"
+            },
+            "scrollbar-thumb": {
+                default: "#ff8f1b",
+                _light: "#ff8f1b",
+                _dark: "#a16cf1"
+            },
+            "scrollbar-thumb-hover": {
+                default: "#ff6f1b",
+                _light: "#ff6f1b",
+                _dark: "#7f3cf1"
+            },
             bordercolor: {
                 default: "gray.200",
                 _light: "gray.200",
