@@ -320,7 +320,7 @@ export default function PostView({notFound = false, svspost = null}) {
                 {
                   post.thumbnail !== undefined && post.thumbnail !== null && post.thumbnail !== ""
                     ? <Image
-                      src={loc.cdn(${post.thumbnail})}
+                      src={loc.cdn(post.thumbnail)}
                       aria-label={"Post Thumbnail"}
                       h={"100%"} maxH={"200px"} m={"40px 0"} />
                     : <></>
