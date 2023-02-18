@@ -375,6 +375,10 @@ async def get_posts(
         max_page=max_page,
     )
 
+@general.get("/post-ids", response_model=List[int])
+async def get_posts_ids():
+    return await Post.filter(hidden=False).values_list("id", flat=True)
+
 @general.get("/post/{post_id}", response_model=SinglePostResponse)
 async def get_single_post(post_id: int):
     post = await Post.get_or_none(id=post_id)
@@ -411,6 +415,10 @@ async def get_series(page: int = Query(1), query_name: str = Query(None, alias="
         series=items,
         max_page=max_page,
     )
+
+@general.get("/series-ids", response_model=List[int])
+async def get_series_ids():
+    return await Series.filter(hidden=False).values_list("id", flat=True)
 
 @general.get("/series/{series_id}", response_model=SingleSeriesResponse)
 async def get_single_series(series_id: int):
