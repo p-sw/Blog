@@ -262,35 +262,19 @@ export default function PostView({notFound = false, svspost = null}) {
             margin-bottom: 10px;
           }
 
-          #content div#dark div:has(> code)::-webkit-scrollbar-track {
-            background: #c0a1f1;
+          #content div:has(> code)::-webkit-scrollbar-track {
+            background: var(--chakra-colors-scrollbar-track);
             border-radius: 10px;
           }
 
-          #content div#dark div:has(> code)::-webkit-scrollbar-thumb {
-            background: #a16cf1;
-            border-radius: 10px;
-            transition: background 0.2s;
-          }
-
-          #content div#dark div:has(> code)::-webkit-scrollbar-thumb:hover {
-            background: #7f3cf1;
-            transition: background 0.2s;
-          }
-
-          #content div#light div:has(> code)::-webkit-scrollbar-track {
-            background: #ffce92;
-            border-radius: 10px;
-          }
-
-          #content div#light div:has(> code)::-webkit-scrollbar-thumb {
-            background: #ff8f1b;
+          #content div:has(> code)::-webkit-scrollbar-thumb {
+            background: var(--chakra-colors-scrollbar-thumb);
             border-radius: 10px;
             transition: background 0.2s;
           }
 
-          #content div#light div:has(> code)::-webkit-scrollbar-thumb:hover {
-            background: #ff6f1b;
+          #content div:has(> code)::-webkit-scrollbar-thumb:hover {
+            background: var(--chakra-colors-scrollbar-thumb-hover);
             transition: background 0.2s;
           }
           
@@ -300,6 +284,10 @@ export default function PostView({notFound = false, svspost = null}) {
           
           #content div.math-display {
             margin: 30px 0;
+          }
+          
+          #content a {
+            color: var(--chakra-colors-scrollbar-thumb-hover);
           }
         `}</style>
         {
