@@ -53,6 +53,7 @@ export default function PostCreateForm({token}) {
   let tagOpenerRef = useRef()
 
   let thumbnailSelectorRef = useRef()
+  let imageUploaderRef = useRef()
 
   let [seriesSearchResult, setSeriesSearchResult] = useState([]);
   let [seriesSearchQuery, setSeriesSearchQuery] = useState("");
@@ -316,7 +317,21 @@ export default function PostCreateForm({token}) {
                 fetch("/cdn/upload", {
                   method: "POST",
                   body: formData
-                }).then(res => res.json()).then(data => {
+                }).then(res => {
+                  if (res.status === 200) {
+                    return res.json()
+                  } else {
+                    toast({
+                      title: `Error: ${res.status}`,
+                      description: `Failed to upload image: ${res.statusText}`,
+                      status: "error",
+                      duration: 5000,
+                      isClosable: true,
+                    })
+                    return null;
+                  }
+                }).then(data => {
+                  if (data === null) return;
                   setBody({...body, thumbnail: `${data.hash}.${e.target.files[0].type.split("/")[1]}`});
                 })
               }} />
@@ -339,7 +354,136 @@ export default function PostCreateForm({token}) {
             </FormControl>
             <FormControl id={"content"} mb={"20px"}>
               <FormLabel>Content</FormLabel>
-              <Textarea value={body.content} onChange={(e) => setBody({...body, content: e.target.value})} resize={"none"} h={"500px"} />
+              <Textarea
+                value={body.content}
+                onChange={(e) => setBody({...body, content: e.target.value})}
+                resize={"none"} h={"500px"}
+                onDrop={(e) => {
+                  e.preventDefault();
+
+                  if (e.dataTransfer.items) {
+                    for (let i = 0; i < e.dataTransfer.items.length; i++) {
+                      if (e.dataTransfer.items[i].kind === "file") {
+                        const file = e.dataTransfer.items[i].getAsFile();
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        fetch("/cdn/upload", {
+                          method: "POST",
+                          body: formData
+                        }).then(res => {
+                          if (res.status === 200) {
+                            return res.json()
+                          } else {
+                            toast({
+                              title: `Error: ${res.status}`,
+                              description: `Failed to upload image: ${res.statusText}`,
+                              status: "error",
+                              duration: 5000,
+                              isClosable: true,
+                            })
+                            return null;
+                          }
+                        }).then(data => {
+                          if (data === null) return;
+                          setBody(prev => {
+                            return {...prev, content: `${prev.content}\n![](https://cdn.sserve.work/${data.hash}.${file.type.split("/")[1]})`}
+                          })
+                        })
+                      }
+                    }
+                  } else if (e.dataTransfer.files) {
+                    for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                      const file = e.dataTransfer.files[i];
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      fetch("/cdn/upload", {
+                        method: "POST",
+                        body: formData
+                      }).then(res => {
+                        if (res.status === 200) {
+                          return res.json()
+                        } else {
+                          toast({
+                            title: `Error: ${res.status}`,
+                            description: `Failed to upload image: ${res.statusText}`,
+                            status: "error",
+                            duration: 5000,
+                            isClosable: true,
+                          })
+                          return null;
+                        }
+                      }).then(data => {
+                        if (data === null) return;
+                        setBody(prev => {
+                          return {...prev, content: `${prev.content}\n![](https://cdn.sserve.work/${data.hash}.${file.type.split("/")[1]})`}
+                        })
+                      })
+                    }
+                  }
+                }}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const items = e.clipboardData.items;
+                  for (let i = 0; i < items.length; i++) {
+                    if (items[i].kind === "file") {
+                      const file = items[i].getAsFile();
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      fetch("/cdn/upload", {
+                        method: "POST",
+                        body: formData
+                      }).then(res => {
+                        if (res.status === 200) {
+                          return res.json()
+                        } else {
+                          toast({
+                            title: `Error: ${res.status}`,
+                            description: `Failed to upload image: ${res.statusText}`,
+                            status: "error",
+                            duration: 5000,
+                            isClosable: true,
+                          })
+                          return null;
+                        }
+                      }).then(data => {
+                        if (data === null) return;
+                        setBody(prev => {
+                          return {...prev, content: `${prev.content}\n![](https://cdn.sserve.work/${data.hash}.${file.type.split("/")[1]})`}
+                        })
+                      })
+                    }
+                  }
+                }}
+              />
+              <Input type={"file"} display={"none"} ref={imageUploaderRef} onChange={(e) => {
+                const formData = new FormData();
+                formData.append("file", e.target.files[0]);
+                fetch("/cdn/upload", {
+                  method: "POST",
+                  body: formData
+                }).then(res => {
+                  if (res.status === 200) {
+                    return res.json()
+                  } else {
+                    toast({
+                      title: `Error: ${res.status}`,
+                      description: `Failed to upload image: ${res.statusText}`,
+                      status: "error",
+                      duration: 5000,
+                      isClosable: true,
+                    })
+                    return null;
+                  }
+                }).then(data => {
+                  if (data === null) return;
+                  setBody(prev => {
+                    return {...prev, content: `${prev.content}\n![](https://cdn.sserve.work/${data.hash}.${e.target.files[0].type.split("/")[1]})`}
+                  });
+                })
+              }} />
+              <Button colorScheme={"blue"} onClick={() => {
+                imageUploaderRef.current.click();
+              }}>Upload</Button>
             </FormControl>
             <FormControl id={"tags"} mb={"20px"}>
               <FormLabel>Tags</FormLabel>
