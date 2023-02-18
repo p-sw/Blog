@@ -53,4 +53,4 @@ Docker와 Nginx를 활용하는 것을 권장합니다.
 - [ ] 포스트 컨텐츠에 텍스트 붙여넣을 경우 예외 두기
 - [ ] 마크다운 링크 스타일링
 - [ ] View 카운트
-- [ ] katex-html aria-hidden=true hidden처리
+- [X] katex-html aria-hidden=true hidden처리

@@ -293,6 +293,14 @@ export default function PostView({notFound = false, svspost = null}) {
             background: #ff6f1b;
             transition: background 0.2s;
           }
+          
+          #content span.katex-html[aria-hidden="true"] {
+            display: none;
+          }
+          
+          #content div.math-display {
+            margin: 30px 0;
+          }
         `}</style>
         {
           post === undefined
