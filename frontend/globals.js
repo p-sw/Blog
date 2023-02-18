@@ -1,4 +1,4 @@
-let dev = true;
+let dev = false;
 
 const loc = {
   backend: (path) => dev ? `http://localhost:8000${path}` : `http://blogbackend:8000${path}`,
