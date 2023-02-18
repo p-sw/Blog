@@ -1,10 +1,11 @@
 import {
-    Flex,
-    Heading,
-    IconButton,
-    Link,
-    useColorMode,
-    useDisclosure
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Link,
+  useColorMode,
+  useDisclosure
 } from "@chakra-ui/react";
 import {
     MoonIcon,
@@ -67,5 +68,45 @@ export default function Navigation(
             }
             {extraButtons}
         </Flex>
+    </Flex>
+}
+
+export function PageNavigation({page, maxPage, onPageChange}) {
+  let pageArray = Array.from({length: Math.min(10, maxPage)}, (_, i) => i + Math.max(1, page - 5)).filter((i) => i <= maxPage);
+
+  return <Flex
+      direction={"row"}
+      justifyContent={"center"}
+      alignItems={"center"}
+      width={"100%"}
+      height={"60px"}
+      m={"40px 0"}
+    >
+      <Flex
+        direction={"row"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        gap={"10px"}
+        width={"90%"}
+        maxW={"800px"}
+        height={"100%"}
+        bgColor={"navbg"}
+        borderRadius={"15px"}
+      >
+        {
+          pageArray.map((i) => {
+            return <Button
+              key={i}
+              onClick={async () => {
+                onPageChange(i);
+              }}
+              bgColor={i === page ? "blue.500" : "transparent"}
+              size={"sm"}
+            >
+              {i}
+            </Button>
+          })
+        }
+      </Flex>
     </Flex>
 }

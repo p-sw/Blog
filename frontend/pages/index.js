@@ -11,6 +11,7 @@ import {useEffect, useState} from "react";
 import {ViewIcon} from "@chakra-ui/icons";
 
 import {PostItem, SeriesItem} from "@/components/items";
+import {PageNavigation} from "@/components/navigation";
 
 
 export default function Index() {
@@ -61,7 +62,7 @@ export default function Index() {
           return;
         }
         setPosts(data["posts"]);
-        setMaxPage(data["maxPage"]);
+        setMaxPage(data["max_page"]);
       })
     } else if (type === "series") {
       fetch(`/api/series?p=${page}&${searchQuery ? "qn="+searchQuery+"&" : ""}${searchTags.map(tag => "qt="+tag).join("&")}`, {
@@ -88,7 +89,7 @@ export default function Index() {
           return;
         }
         setSeries(data["series"]);
-        setMaxPage(data["maxPage"]);
+        setMaxPage(data["max_page"]);
       })
     }
     setSearchTrigger(false);
@@ -170,5 +171,13 @@ export default function Index() {
         }()
       }
     </Flex>
+    <PageNavigation
+      page={page}
+      maxPage={maxPage}
+      onPageChange={(p) => {
+        setPage(p);
+        setSearchTrigger(true);
+      }}
+    />
   </DefaultLayout>
 }

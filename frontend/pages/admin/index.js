@@ -18,6 +18,7 @@ import {AdminPostItem, AdminSeriesItem, AdminTagItem} from "@/components/items";
 import {useRouter} from "next/router";
 import {AddIcon, ViewIcon} from "@chakra-ui/icons";
 import SearchBar from "@/components/searchbar";
+import {PageNavigation} from "@/components/navigation";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
@@ -286,43 +287,13 @@ export default function Admin({token}) {
               : <Text>Unknown type</Text>
       }
     </Flex>
-    <Flex
-      direction={"row"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      width={"100%"}
-      height={"60px"}
-    >
-      <Flex
-        direction={"row"}
-        justifyContent={"center"}
-        alignItems={"center"}
-        gap={"10px"}
-        width={"90%"}
-        maxW={"800px"}
-        height={"100%"}
-        bgColor={"navbg"}
-        borderRadius={"15px"}
-      >
-        {
-          function (){
-            const range = Array.from({length: Math.min(10, maxPage)}, (_, i) => i + Math.max(1, page - 5)).filter((i) => i <= maxPage);
-            return range.map((i) => {
-              return <Button
-                key={i}
-                onClick={async () => {
-                  setPage(i);
-                  setSearchTrigger(true);
-                }}
-                bgColor={i === page ? "blue.500" : "transparent"}
-                size={"sm"}
-              >
-                {i}
-              </Button>
-            })
-          }()
-        }
-      </Flex>
-    </Flex>
+    <PageNavigation
+      page={page}
+      maxPage={maxPage}
+      onPageChange={(p) => {
+        setPage(p);
+        setSearchTrigger(true);
+      }}
+    />
   </DefaultLayout>
 }
