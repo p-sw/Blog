@@ -271,12 +271,12 @@ export default function PostView({notFound = false, svspost = null}) {
           #content div:has(> code)::-webkit-scrollbar-thumb {
             background: var(--chakra-colors-scrollbar-thumb);
             border-radius: 10px;
-            transition: background 0.2s;
+            transition: 0.2s;
           }
 
           #content div:has(> code)::-webkit-scrollbar-thumb:hover {
             background: var(--chakra-colors-scrollbar-thumb-hover);
-            transition: background 0.2s;
+            transition: 0.2s;
           }
           
           #content span.katex-html[aria-hidden="true"] {
@@ -285,6 +285,31 @@ export default function PostView({notFound = false, svspost = null}) {
           
           #content div.math-display {
             margin: 30px 0;
+            width: 100%;
+            overflow-y: hidden;
+            overflow-x: auto;
+          }
+          
+          #content div.math-display::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+            margin-bottom: 10px;
+          }
+          
+          #content div.math-display::-webkit-scrollbar-track {
+            background: var(--chakra-colors-scrollbar-track);
+            border-radius: 10px;
+          }
+          
+          #content div.math-display::-webkit-scrollbar-thumb {
+            background: var(--chakra-colors-scrollbar-thumb);
+            border-radius: 10px;
+            transition: 0.2s;
+          }
+
+          #content div.math-display::-webkit-scrollbar-thumb:hover {
+            background: var(--chakra-colors-scrollbar-thumb-hover);
+            transition: 0.2s;
           }
           
           #content a {
