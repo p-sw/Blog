@@ -183,6 +183,7 @@ export default function PostView({notFound = false, svspost = null}) {
           #content p {
             font-size: 1rem;
             line-height: var(--chakra-lineHeights-tall);
+            margin: 30px;
           }
 
           #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
