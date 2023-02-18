@@ -28,7 +28,7 @@ import {AdminSeriesItem, AdminTagItem} from "@/components/items";
 
 export async function getServerSideProps(context) {
   if (!await hasToken(context.req.cookies)) {
-    return
+    return ServerSideRedirection("/admin/login", false)
   }
 
   if (!await tokenValidate(context.req.cookies.token)) {
