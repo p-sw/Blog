@@ -2,7 +2,6 @@
 module.exports = {
   siteUrl: 'https://blog.sserve.work',
   generateRobotsTxt: true,
-  sitemapSize: 7000,
   exclude: [
     "/admin/*",
     "/api/*",

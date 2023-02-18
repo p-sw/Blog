@@ -17,8 +17,8 @@ export const getServerSideProps = async (ctx) => {
   })
 
   return getServerSideSitemapIndex(ctx, [
-    ...(await post_ids.json()).map(id => `/post/${id}`),
-    ...(await series_ids.json()).map(id => `/series/${id}`)
+    ...(await post_ids.json()).map(id => loc.defaultUrl + `/post/${id}`),
+    ...(await series_ids.json()).map(id => loc.defaultUrl + `/series/${id}`)
   ])
 }
 

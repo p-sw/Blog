@@ -21,7 +21,7 @@ import RemarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
-import {materialDark, materialLight} from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import {materialDark, oneLight} from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import {NextSeo} from "next-seo";
 import loc from "@/globals";
 
@@ -125,7 +125,7 @@ export default function PostView({notFound = false, svspost = null}) {
     return <Box p={"10px"} id={colorMode}>{
       !inline && match ? (
         <SyntaxHighlighter
-          style={colorMode === "light" ? materialLight : materialDark}
+          style={colorMode === "light" ? oneLight : materialDark}
           language={match[1]}
           PreTag="div"
           {...props}

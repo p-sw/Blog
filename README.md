@@ -31,6 +31,12 @@ Python 3.11.1 & NodeJS v18.13.0
 ## 배포
 Docker와 Nginx를 활용하는 것을 권장합니다.
 
+- Backend와 Frontend 둘 다 Dockerfile이 있습니다.
+- frontend/globals.js와 next-sitemap.config.js에서 웹사이트의 URL을 변경해야 합니다.
+- Docker를 이용하는 경우
+  + frontend/globals.js에서 dev 변수를 false로 설정해야 합니다
+  + backend의 docker container 이름을 `blogbackend` 로 설정해야 합니다.
+
 ## Todo List
 
 - [X] 메인 검색 기능
@@ -53,3 +59,5 @@ Docker와 Nginx를 활용하는 것을 권장합니다.
 - [X] 마크다운 링크 스타일링
 - [ ] View 카운트
 - [X] katex-html aria-hidden=true hidden처리
+- [ ] 씹창난 모바일 뷰 개선
+- [ ] 포스트 댓글
