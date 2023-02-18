@@ -3,8 +3,39 @@ import DefaultLayout from "@/layouts/default";
 import {Flex, Spinner, useToast, Text} from "@chakra-ui/react";
 import {useEffect, useState} from "react";
 import {PostItem} from "@/components/items";
+import {NextSeo} from "next-seo";
 
-export default function SeriesView() {
+export async function getServerSideProps(context) {
+  let req = fetch(`http://127.0.0.1:8000/api/series/${context.params["series_id"]}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }).then(res => {
+    if (res.status === 200) {
+      return res.json();
+    } else {
+      return null;
+    }
+  })
+
+  let res = await req;
+  if (res === null) {
+    return {
+      props: {
+        notFound: true
+      }
+    }
+  } else {
+    return {
+      props: {
+        svsseries: res
+      }
+    }
+  }
+}
+
+export default function SeriesView({notFound=false, svsseries=null}) {
   let router = useRouter();
   let toast = useToast();
 
@@ -75,6 +106,22 @@ export default function SeriesView() {
   }, [posts])
 
   return <DefaultLayout>
+    <NextSeo
+      title={!notFound ? svsseries.name : "404"}
+      description={!notFound ? svsseries.description : "Series Not Found"}
+      openGraph={{
+        title: !notFound ? svsseries.name : "404",
+        description: !notFound ? svsseries.description : "Series Not Found",
+        images: !notFound && svsseries.thumbnail !== null && svsseries.thumbnail !== undefined && svsseries.thumbnail !== "" ? [
+          {
+            url: `https://cdn.sserve.work/${svsseries.thumbnail}`,
+            width: 800,
+            height: 600,
+            alt: svsseries.name,
+          }
+        ] : []
+      }}
+    />
     <Flex
       direction={"column"}
       alignItems={"center"}

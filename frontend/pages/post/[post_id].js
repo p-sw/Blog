@@ -22,9 +22,42 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
 import {materialDark, materialLight} from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import {NextSeo} from "next-seo";
 
 
-export default function PostView() {
+export async function getServerSideProps(context) {
+  // for seo
+  let req = fetch(`http://127.0.0.1:8000/api/post/${context.params["post_id"]}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }).then(res => {
+    if (res.status === 200) {
+      return res.json();
+    } else {
+      return null;
+    }
+  })
+
+  let res = await req;
+  if (res === null) {
+    return {
+      props: {
+        notFound: true
+      }
+    }
+  } else {
+    return {
+      props: {
+        svspost: res
+      }
+    }
+  }
+}
+
+
+export default function PostView({notFound = false, svspost = null}) {
   let router = useRouter();
   let toast = useToast();
 
@@ -106,6 +139,22 @@ export default function PostView() {
 
 
   return <DefaultLayout>
+    <NextSeo
+      title={!notFound ? svspost.title : "404"}
+      description={!notFound ? svspost.description : "Post Not Found"}
+      openGraph={{
+        title: !notFound ? svspost.title : "404",
+        description: !notFound ? svspost.description : "Post Not Found",
+        images: !notFound && svspost.thumbnail !== undefined && svspost.thumbnail !== null && svspost.thumbnail !== "" ? [
+          {
+            url: `https://cdn.sserve.work/${svspost.thumbnail}`,
+            width: 800,
+            height: 600,
+            alt: svspost.title,
+          }
+        ] : []
+      }}
+    />
     <Flex
       direction={"column"}
       align={"center"}
