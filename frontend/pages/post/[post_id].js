@@ -178,6 +178,7 @@ export default function PostView({notFound = false, svspost = null}) {
             margin: 50px auto;
             max-width: 400px;
             max-height: 400px;
+            width: 100%;
           }
 
           #content p {
