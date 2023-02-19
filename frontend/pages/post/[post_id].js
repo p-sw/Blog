@@ -178,6 +178,7 @@ export default function PostView({notFound = false, svspost = null}) {
             margin: 50px auto;
             max-width: 400px;
             max-height: 400px;
+            width: 100%;
           }
 
           #content p {
@@ -347,7 +348,7 @@ export default function PostView({notFound = false, svspost = null}) {
                       h={"100%"} maxH={"200px"} m={"40px 0"} />
                     : <></>
                 }
-                <Text fontSize={"lg"} fontWeight={"semibold"} mb={"20px"} w={"100%"}>{post.description}</Text>
+                <Text fontSize={"md"} fontWeight={"normal"} mb={"20px"} w={"100%"} lineHeight={"tall"}>{post.description}</Text>
                 <Divider m={"30px 0"} />
                 <Box id={"content"} w={"100%"}>
                   <ReactMarkdown

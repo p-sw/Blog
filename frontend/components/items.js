@@ -15,7 +15,7 @@ import {
   LinkOverlay,
   LinkBox,
   Tag,
-  useToast
+  useToast, Grid, GridItem
 } from "@chakra-ui/react";
 import {ChevronDownIcon, Icon} from "@chakra-ui/icons";
 import {AiFillDelete, AiFillEdit} from "react-icons/ai";
@@ -244,27 +244,38 @@ function DefaultItemObject({type, obj}) {
     }).then(data => setTagIds(data))
   }, [])
 
-  return <LinkBox as={Card} direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
-    <Box w={"30%"} h={"auto"} borderLeftRadius={"base"}>
-      {
-        obj.thumbnail !== undefined && obj.thumbnail !== null && obj.thumbnail !== ""
-          ? <Image src={loc.cdn(obj.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} borderLeftRadius={"base"} />
-          : <Skeleton h={"100%"} w={"100%"} />
-      }
-    </Box>
-    <Flex direction={"column"} w={"100%"}>
-      <CardBody>
-        <Heading fontSize={"3xl"} fontWeight={"bold"}>
+  return <LinkBox direction={["column", "row"]} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={["20rem", "10rem"]} bgColor={"itembg"} borderRadius={"base"}>
+    <Grid
+      templateColumns={"repeat(4, 1fr)"}
+      templateRows={"repeat(8, 1fr)"}
+      w={"100%"} h={"100%"}
+      rowGap={"10px"} columnGap={"10px"}
+      p={"10px"}
+    >
+      <GridItem rowSpan={[4, 8]} colSpan={[4, 1]}>
+        {
+          obj.thumbnail !== undefined && obj.thumbnail !== null && obj.thumbnail !== ""
+            ? <Image src={loc.cdn(obj.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} borderRadius={"base"} />
+            : <Skeleton h={"100%"} w={"100%"} borderLeftRadius={"base"} />
+        }
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={[4, 3]}>
+        <Heading fontSize={["xl", "2xl", null, "3xl"]} fontWeight={"bold"}>
           <LinkOverlay href={`/${type}/${obj.id}`}>{obj.title !== undefined ? obj.title : obj.name}</LinkOverlay>
         </Heading>
-        <Text>{obj.description}</Text>
-      </CardBody>
-      <CardFooter gap={"10px"}>
+      </GridItem>
+      <GridItem rowSpan={[3, 5]} colSpan={[4, 3]}>
+        <Text
+          fontSize={["sm", null, "md"]}
+          overflow={"hidden"} h={"100%"} w={"100%"}
+        >{obj.description}</Text>
+      </GridItem>
+      <GridItem as={Flex} rowSpan={[1, 2]} colSpan={[4, 3]} gap={"10px"} direction={"row"}>
         {
           tagIds.map((id, index) => <TagItem key={index} id={id} />)
         }
-      </CardFooter>
-    </Flex>
+      </GridItem>
+    </Grid>
   </LinkBox>
 }
 

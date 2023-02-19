@@ -36,7 +36,7 @@ export default function Navigation(
       zIndex={99}
     >
         <Link href={"/"} _hover={{underline: "none"}}>
-            <Heading fontSize={"2xl"}>
+            <Heading fontSize={["lg", null, "xl", null, "2xl"]}>
                 SV Devlog
             </Heading>
         </Link>
