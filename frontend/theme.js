@@ -68,6 +68,11 @@ const theme = extendTheme({
                 default: "white",
                 _light: "white",
                 _dark: "#222"
+            },
+            itembg: {
+                default: "gray.200",
+                _light: "gray.200",
+                _dark: "#333"
             }
         },
         shadows: {
