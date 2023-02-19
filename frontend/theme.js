@@ -3,7 +3,7 @@ import {mode} from "@chakra-ui/theme-tools";
 
 const theme = extendTheme({
     config: {
-        initialColorMode: "light", // IMPORTANT: change initialColorMode to "system" when prod mode
+        initialColorMode: "system",
         useSystemColorMode: false
     },
     fonts: {
