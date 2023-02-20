@@ -23,113 +23,82 @@ import {FaExternalLinkAlt} from "react-icons/fa";
 import {useEffect, useState} from "react";
 import loc from "@/globals";
 
-export function AdminPostItem({post, inseries=false, onDeleteInSeries, token, refresh}) {
+function DefaultAdminItem({obj, type, token, refresh, inseries=false, onDeleteInSeries=()=>{}}) {
   let router = useRouter();
 
   function deleteThis() {
-    fetch("/api/post", {
+    fetch(`/api/${type}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         "token": token
       },
       body: JSON.stringify({
-        id: post.id
+        id: obj.id
       })
     }).then(res => {
       if (res.status === 200) {
         refresh();
         return true;
       } else {
-        return res.json();
+        return res.json()
       }
     }).then(data => {
       console.log(data);
     })
   }
 
-  return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={"fit-content"}>
-    <Box w={"30%"} h={"auto"}>
-      {
-        post.thumbnail !== null && post.thumbnail !== ""
-          ? <Image src={loc.cdn(post.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
-          : <Skeleton h={"100%"} w={"100%"} />
-      }
-    </Box>
-    <Flex direction={"column"} w={"100%"}>
-      <CardBody>
-        <Heading fontSize={"3xl"} fontWeight={"bold"}>{post.title}</Heading>
-        <Text>{post.description}</Text>
-      </CardBody>
-      <CardFooter gap={"10px"}>
-        <IconButton icon={<Icon as={FaExternalLinkAlt} />} onClick={async () => await router.push(`/post/${post.id}`)} aria-label={"view"} />
+  return <Flex direction={["column", "row"]} boxSizing={"border-box"} w={"90%"} maxW={"800px"} h={["20rem", "10rem"]} bgColor={"itembg"} borderRadius={"base"}>
+    <Grid
+      templateColumns={"repeat(4, 1fr)"}
+      templateRows={"repeat(8, 1fr)"}
+      w={"100%"} h={"100%"}
+      rowGap={"10px"} columnGap={"10px"}
+      p={"10px"}
+    >
+      <GridItem rowSpan={[4, 8]} colSpan={[4, 1]}>
+        {
+          obj.thumbnail !== undefined && obj.thumbnail !== null && obj.thumbnail !== ""
+            ? <Image src={loc.cdn(obj.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} borderRadius={"base"} />
+            : <Skeleton h={"100%"} w={"100%"} borderLeftRadius={"base"} />
+        }
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={[4, 3]}>
+        <Heading fontSize={["xl", "2xl", null, "3xl"]} fontWeight={"bold"}>
+          {obj.title !== undefined ? obj.title : obj.name}
+        </Heading>
+      </GridItem>
+      <GridItem rowSpan={[3, 5]} colSpan={[4, 3]}>
+        <Text
+          fontSize={["sm", null, "md"]}
+          overflow={"hidden"} h={"100%"} w={"100%"}
+        >{obj.description}</Text>
+      </GridItem>
+      <GridItem as={Flex} rowSpan={[1, 2]} colSpan={[4, 3]} gap={"10px"} direction={"row"}>
+        <IconButton icon={<Icon as={FaExternalLinkAlt} />} onClick={async () => await router.push(`/${type}/${obj.id}`)} aria-label={"view"} />
         <Menu>
           <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
           <MenuList>
-            <MenuItem onClick={async () => {await router.push(`/admin/create/post?pid=${post.id}`)}}>Edit</MenuItem>
+            <MenuItem onClick={async () => {await router.push(`/admin/create/${type}?pid=${obj.id}`)}}>Edit</MenuItem>
             <MenuItem onClick={deleteThis}>Delete</MenuItem>
           </MenuList>
         </Menu>
         {
-          inseries
+          type === "post" && inseries
             ? <IconButton icon={<Icon as={AiFillDelete} />} aria-label={"delete"} onClick={onDeleteInSeries} />
             : null
         }
-      </CardFooter>
-    </Flex>
-  </Card>
+      </GridItem>
+    </Grid>
+  </Flex>
+}
+
+export function AdminPostItem({post, inseries=false, onDeleteInSeries, token, refresh}) {
+  return <DefaultAdminItem obj={post} token={token} refresh={refresh} type={"post"} inseries={inseries} onDeleteInSeries={onDeleteInSeries} />
 }
 
 export function AdminSeriesItem({series, token, refresh}) {
-  let router = useRouter();
-
-  function deleteThis() {
-    fetch("/api/series", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify({
-        id: series.id
-      })
-    }).then(res => {
-      if (res.status === 200) {
-        refresh();
-        return true;
-      } else {
-        return res.json();
-      }
-    }).then(data => {
-      console.log(data);
-    })
-  }
-
-  return <Card direction={"row"} boxSizing={"border-box"} w={"90%"} maxW={"800px"}>
-    <Box w={"30%"} h={"auto"}>
-      {
-        series.thumbnail !== null && series.thumbnail !== ""
-          ? <Image src={loc.cdn(series.thumbnail)} h={"100%"} w={"100%"} alt={""} objectFit={"cover"} />
-          : <Skeleton h={"100%"} w={"100%"} />
-      }
-    </Box>
-    <Flex direction={"column"} w={"100%"}>
-      <CardBody>
-        <Heading fontSize={"3xl"} fontWeight={"bold"}>{series.name}</Heading>
-        <Text>{series.description}</Text>
-      </CardBody>
-      <CardFooter gap={"10px"}>
-        <IconButton onClick={async () => await router.push(`/series/${series.id}`)} icon={<Icon as={FaExternalLinkAlt} />} aria-label={"view"} />
-        <Menu>
-          <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
-          <MenuList>
-            <MenuItem onClick={async () => {await router.push(`/admin/create/series?pid=${series.id}`)}}>Edit</MenuItem>
-            <MenuItem onClick={deleteThis}>Delete</MenuItem>
-          </MenuList>
-        </Menu>
-      </CardFooter>
-    </Flex>
-  </Card>
+  return <DefaultAdminItem obj={series} token={token} refresh={refresh} type={"series"} />
 }
 
 export function AdminTagItem({tag, inseries=false, onDeleteInSeries, token, refresh}) {
