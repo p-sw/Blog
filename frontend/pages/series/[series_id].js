@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import {PostItem} from "@/components/items";
 import {NextSeo} from "next-seo";
 import loc from "@/globals";
+import {PageNavigation} from "@/components/navigation";
 
 export async function getServerSideProps(context) {
   let req = fetch(loc.backend(`/api/series/${context.params["series_id"]}`), {
@@ -45,6 +46,9 @@ export default function SeriesView({notFound=false, svsseries=null}) {
   let [posts, setPosts] = useState(undefined);
   let [postDict, setPostDict] = useState({});
 
+  let [page, setPage] = useState(1);
+  let [maxPage, setMaxPage] = useState(undefined);
+
   useEffect(() => {
     if (series_id === undefined) return;
     fetch(`/api/series/${series_id}/get-posts`, {
@@ -68,15 +72,17 @@ export default function SeriesView({notFound=false, svsseries=null}) {
     }).then(data => {
       if (data === null) {
         setPosts(null);
+        setMaxPage(null);
         return;
       }
       setPosts(data);
+      setMaxPage(Math.ceil(data.length / 10));
     })
   }, [series_id])
 
   useEffect(() => {
     if (posts === undefined || posts === null || posts.length === 0) return;
-    for (let post_id of posts) {
+    for (let post_id of posts.slice((page - 1) * 10, page * 10)) {
       fetch(`/api/post/${post_id}`, {
         method: "GET",
         headers: {
@@ -104,7 +110,7 @@ export default function SeriesView({notFound=false, svsseries=null}) {
         })
       })
     }
-  }, [posts])
+  }, [posts, page])
 
   return <DefaultLayout>
     <NextSeo
@@ -144,5 +150,10 @@ export default function SeriesView({notFound=false, svsseries=null}) {
               })
       }
     </Flex>
+    {
+      maxPage !== undefined && maxPage !== null
+        ? <PageNavigation page={page} maxPage={maxPage} onPageChange={setPage} />
+        : null
+    }
   </DefaultLayout>
 }
